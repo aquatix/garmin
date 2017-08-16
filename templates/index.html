@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Garmin Wellness</title>
+        <meta charset="utf-8"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
+<style>
+body
+{
+    background-color: #FFF;
+}
+h1, p, .contentblock
+{
+    font-family: Verdana, sans-serif;
+    color: #141414;
+}
+.contentblock
+{
+    width: 500px;
+    float: left;
+    padding: 5px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    background-color: #1f1d1d;
+    border: 1px solid #292929;
+}
+.contentblock h2
+{
+    font-weight: normal;
+}
+.contentblock p
+{
+    font-size: .75em;
+    margin: 0;
+}
+.contentblock td
+{
+    background-color: #141414;
+    font-size: .6em;
+    color: #D8D9DA;
+}
+.warning
+{
+    color: #F00;
+}
+</style>
+    </head>
+    <body>
+
+        <h1>Garmin Wellness</h1>
+
+        {% for summary in summaries %}
+
+        <div class="contentblock">
+        <h2>{{ publication }}</h2>
+
+        <canvas id="{{ publication }}"></canvas>
+
+
+        <script>
+var ctx = document.getElementById('{{ publication }}').getContext('2d');
+var myChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: [
+        {% for pubmonth in publications[publication]['months'] %}
+            '{{ pubmonth[0] }}',
+        {% endfor %}
+    ],
+    datasets: [{
+      label: 'articles',
+      data: [
+          {% for pubmonth in publications[publication]['months'] %}
+              '{{ pubmonth[1] }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(153,255,51,0.4)"
+    }, {
+      label: 'running avg (6 month)',
+      data: [
+          {% for pubmonth in publications[publication]['months'] %}
+              '{{ pubmonth[3] }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(255,255,0,0.4)"
+    }, {
+      label: 'avg/day',
+      data: [
+          {% for pubmonth in publications[publication]['months'] %}
+              '{{ pubmonth[2] }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(255,153,0,0.4)"
+    }
+    ]
+  }
+});
+        </script>
+
+        {% if trends[publication]['average'] == 0.0: %}
+        <p class="warning">No new articles in at least {{ trends[publication]['nrdays'] }} days. Latest article is from {{ trends[publication]['latestarticle'] }}</p>
+        {% else %}
+        <p>Trend: {{ '%0.2f'| format(trends[publication]['average']|float) }} average articles/day over the last {{ trends[publication]['nrdays'] }} days</p>
+        {% endif %}
+
+        </div>
+        {% endfor %}
+
+    </body>
+</html>
