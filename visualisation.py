@@ -87,8 +87,10 @@ def parse_files(directory, target_directory):
         else:
             continue
 
-    return summary, wellness
+    # Reverse list so latest days are on top
+    summary = summary[::-1]
 
+    return summary, wellness
 
 
 def generate_wellnesspage(template_dir, outputfile, summary, wellness):
