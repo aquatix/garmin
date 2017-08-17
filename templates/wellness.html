@@ -92,6 +92,14 @@ var myChart = new Chart(ctx, {
       ],
       backgroundColor: "rgba(153,255,51,0.4)"
     }, {
+      label: 'various',
+      data: [
+          {% for steps in summary['generic_steps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(153,153,153,0.4)"
+    }, {
       label: 'sleeping',
       data: [
           {% for steps in summary['sleeping_steps'] %}

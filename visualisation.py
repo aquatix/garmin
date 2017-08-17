@@ -29,6 +29,7 @@ def summary_to_graphdata(content):
     active_steps_list = []
     highlyactive_steps_list = []
     sedentary_steps_list = []
+    generic_steps_list = []
     totalsteps = 0
 
     for item in content:
@@ -36,6 +37,7 @@ def summary_to_graphdata(content):
         active_steps = 0
         highlyactive_steps = 0
         sedentary_steps = 0
+        generic_steps = 0
         datetimes.append(item['startGMT'])
         totalsteps = totalsteps + item['steps']
         totalsteps_list.append(totalsteps)
@@ -47,15 +49,22 @@ def summary_to_graphdata(content):
             highlyactive_steps = item['steps']
         elif item['primaryActivityLevel'] == 'sleeping':
             sleeping_steps = item['steps']
+        elif item['primaryActivityLevel'] == 'generic' or item['primaryActivityLevel'] == 'none':
+            generic_steps = item['steps']
+        else:
+            #print(item['primaryActivityLevel'])
+            print(item)
 
         sleeping_steps_list.append(sleeping_steps)
         active_steps_list.append(active_steps)
         highlyactive_steps_list.append(highlyactive_steps)
         sedentary_steps_list.append(sedentary_steps)
+        generic_steps_list.append(generic_steps)
 
     return {'datetime': datetimes, 'totalsteps': totalsteps_list,
             'sleeping_steps': sleeping_steps_list, 'active_steps': active_steps_list,
-            'highlyactive_steps': highlyactive_steps_list, 'sedentary_steps': sedentary_steps_list}
+            'highlyactive_steps': highlyactive_steps_list, 'sedentary_steps': sedentary_steps_list,
+            'generic_steps': generic_steps_list}
 
 
 def parse_wellness(content):
