@@ -9,10 +9,16 @@ body
 {
     background-color: #FFF;
 }
-h1, p, .contentblock
+h1, h2, p, .contentblock
 {
     font-family: Verdana, sans-serif;
     color: #141414;
+}
+h2
+{
+    color: #AAA;
+    border-bottom: 1px solid #AAA;
+    clear: both;
 }
 .contentblock
 {
@@ -21,8 +27,8 @@ h1, p, .contentblock
     padding: 5px;
     margin-bottom: 10px;
     margin-right: 10px;
-/*    background-color: #1f1d1d;*/
-    border: 1px solid #292929;
+/*    background-color: #1f1d1d;
+    border: 1px solid #292929;*/
 }
 .contentblock h2
 {
@@ -51,8 +57,8 @@ h1, p, .contentblock
 
         {% for datestamp, summary in summaries %}
 
-        <div class="contentblock">
         <h2>{{ datestamp }}</h2>
+        <div class="contentblock">
 
         <canvas id="{{ datestamp }}"></canvas>
 
@@ -114,7 +120,6 @@ var myChart = new Chart(ctx, {
               '{{ steps }}',
           {% endfor %}
       ],
-      /*backgroundColor: "rgba(255,255,0,0.4)",*/
       borderColor: "rgba(0,0,0,0.4)",
         type: 'line'
     },
@@ -126,16 +131,33 @@ var myChart = new Chart(ctx, {
     ]
   },
   options: {
-  scales: {
+      scales: {
           xAxes: [{
-                    type: 'time',
-        }]}
+              type: 'time',
+          }]
+      },
+      layout: {
+          padding: {
+              left: 50,
+              right: 0,
+              top: 0,
+              bottom: 0
+          }
+      }
   }
 });
         </script>
 
-        <p>Summary</p>
+        </div>
 
+        <div class="contentblock">
+        <p>Summary</p>
+        <ul>
+            <li>Steps total: {{ wellness['total_steps'][datestamp] }}</li>
+            <li>Steps goal: {{ wellness['total_step_goal'][datestamp] }}</li>
+            <li>Floors ascended: {{ wellness['floors_ascended'][datestamp] }}</li>
+            <li>Floors descended: {{ wellness['floors_descended'][datestamp] }}</li>
+        </ul>
         </div>
         {% endfor %}
 

@@ -53,6 +53,7 @@ def summary_to_graphdata(content):
             generic_steps = item['steps']
         else:
             #print(item['primaryActivityLevel'])
+            print('Unknown activity level found:')
             print(item)
 
         sleeping_steps_list.append(sleeping_steps)
@@ -67,23 +68,40 @@ def summary_to_graphdata(content):
             'generic_steps': generic_steps_list}
 
 
-def parse_wellness(content):
-    return content
+def parse_wellness(wellness, content):
+    try:
+        content['allMetrics']
+    except TypeError:
+        # Not a correct wellness file
+        return wellness
+
+    for item in content['allMetrics']['metricsMap']:
+        key = item.lstrip('WELLNESS_').lower()
+        for value in content['allMetrics']['metricsMap'][item]:
+            if key not in wellness:
+                wellness[key] = {}
+            if value['value']:
+                wellness[key][value['calendarDate']] = int(value['value'])
+            else:
+                wellness[key][value['calendarDate']] = None
+    return wellness
 
 
 def parse_files(directory, target_directory):
     summary = []
-    wellness = []
+    wellness = {}
     for filename in sorted(os.listdir(directory)):
-        print filename
         if filename.endswith("_summary.json"):
             # parse summary, create graph
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
             summary.append((filename.split('_')[0], summary_to_graphdata(content)))
         elif filename.endswith(".json"):
+            print filename
             # parse wellness data
-            continue
+            with open(os.path.join(directory, filename), 'r') as f:
+                content = json.load(f)
+            wellness = parse_wellness(wellness, content)
         else:
             continue
 
@@ -133,7 +151,6 @@ if __name__ == "__main__":
     inputdir = args['input']
     summary, wellness = parse_files(inputdir, outputdir)
     template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
-    print template_dir
     outputfile = os.path.join(outputdir, 'wellness.html')
 
     # Create output directory (if it does not already exist).
