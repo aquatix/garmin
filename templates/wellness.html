@@ -16,12 +16,12 @@ h1, p, .contentblock
 }
 .contentblock
 {
-    width: 500px;
+    width: 800px;
     float: left;
     padding: 5px;
     margin-bottom: 10px;
     margin-right: 10px;
-    background-color: #1f1d1d;
+/*    background-color: #1f1d1d;*/
     border: 1px solid #292929;
 }
 .contentblock h2
@@ -49,59 +49,84 @@ h1, p, .contentblock
 
         <h1>Garmin Wellness</h1>
 
-        {% for summary in summaries %}
+        {% for datestamp, summary in summaries %}
 
         <div class="contentblock">
-        <h2>{{ publication }}</h2>
+        <h2>{{ datestamp }}</h2>
 
-        <canvas id="{{ publication }}"></canvas>
+        <canvas id="{{ datestamp }}"></canvas>
 
 
         <script>
-var ctx = document.getElementById('{{ publication }}').getContext('2d');
+var ctx = document.getElementById('{{ datestamp }}').getContext('2d');
 var myChart = new Chart(ctx, {
-  type: 'line',
+  type: 'bar',
   data: {
     labels: [
-        {% for pubmonth in publications[publication]['months'] %}
-            '{{ pubmonth[0] }}',
+        {% for datetime in summary['datetime'] %}
+            '{{ datetime }}',
         {% endfor %}
     ],
     datasets: [{
-      label: 'articles',
+      label: 'sedentary',
       data: [
-          {% for pubmonth in publications[publication]['months'] %}
-              '{{ pubmonth[1] }}',
+          {% for steps in summary['sedentary_steps'] %}
+              '{{ steps }}',
           {% endfor %}
       ],
-      backgroundColor: "rgba(153,255,51,0.4)"
+      backgroundColor: "rgba(255,153,0,0.4)"
     }, {
-      label: 'running avg (6 month)',
+      label: 'active',
       data: [
-          {% for pubmonth in publications[publication]['months'] %}
-              '{{ pubmonth[3] }}',
+          {% for steps in summary['active_steps'] %}
+              '{{ steps }}',
           {% endfor %}
       ],
       backgroundColor: "rgba(255,255,0,0.4)"
     }, {
-      label: 'avg/day',
+      label: 'highly active',
       data: [
-          {% for pubmonth in publications[publication]['months'] %}
-              '{{ pubmonth[2] }}',
+          {% for steps in summary['highlyactive_steps'] %}
+              '{{ steps }}',
           {% endfor %}
       ],
-      backgroundColor: "rgba(255,153,0,0.4)"
-    }
+      backgroundColor: "rgba(153,255,51,0.4)"
+    }, {
+      label: 'sleeping',
+      data: [
+          {% for steps in summary['sleeping_steps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,153,0.4)"
+    }, {
+      label: 'totalsteps',
+      data: [
+          {% for steps in summary['totalsteps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      /*backgroundColor: "rgba(255,255,0,0.4)",*/
+      borderColor: "rgba(0,0,0,0.4)",
+        type: 'line'
+    },
+    /*
+                "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
+            "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
+            "borderWidth": 1
+*/
     ]
+  },
+  options: {
+  scales: {
+          xAxes: [{
+                    type: 'time',
+        }]}
   }
 });
         </script>
 
-        {% if trends[publication]['average'] == 0.0: %}
-        <p class="warning">No new articles in at least {{ trends[publication]['nrdays'] }} days. Latest article is from {{ trends[publication]['latestarticle'] }}</p>
-        {% else %}
-        <p>Trend: {{ '%0.2f'| format(trends[publication]['average']|float) }} average articles/day over the last {{ trends[publication]['nrdays'] }} days</p>
-        {% endif %}
+        <p>Summary</p>
 
         </div>
         {% endfor %}

@@ -27,12 +27,14 @@ def summary_to_graphdata(content):
     totalsteps_list = []
     sleeping_steps_list = []
     active_steps_list = []
+    highlyactive_steps_list = []
     sedentary_steps_list = []
     totalsteps = 0
 
     for item in content:
         sleeping_steps = 0
         active_steps = 0
+        highlyactive_steps = 0
         sedentary_steps = 0
         datetimes.append(item['startGMT'])
         totalsteps = totalsteps + item['steps']
@@ -41,16 +43,19 @@ def summary_to_graphdata(content):
             sedentary_steps = item['steps']
         elif item['primaryActivityLevel'] == 'active':
             active_steps = item['steps']
+        elif item['primaryActivityLevel'] == 'highlyActive':
+            highlyactive_steps = item['steps']
         elif item['primaryActivityLevel'] == 'sleeping':
             sleeping_steps = item['steps']
 
         sleeping_steps_list.append(sleeping_steps)
         active_steps_list.append(active_steps)
+        highlyactive_steps_list.append(highlyactive_steps)
         sedentary_steps_list.append(sedentary_steps)
 
     return {'datetime': datetimes, 'totalsteps': totalsteps_list,
             'sleeping_steps': sleeping_steps_list, 'active_steps': active_steps_list,
-            'sedentary_steps': sedentary_steps_list}
+            'highlyactive_steps': highlyactive_steps_list, 'sedentary_steps': sedentary_steps_list}
 
 
 def parse_wellness(content):
@@ -66,7 +71,7 @@ def parse_files(directory, target_directory):
             # parse summary, create graph
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
-            summary.append(summary_to_graphdata(content))
+            summary.append((filename.split('_')[0], summary_to_graphdata(content)))
         elif filename.endswith(".json"):
             # parse wellness data
             continue
@@ -83,7 +88,7 @@ def generate_wellnesspage(template_dir, outputfile, summary, wellness):
     environment = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
 
     try:
-        template = environment.get_template('index.html')
+        template = environment.get_template('wellness.html')
     except jinja2.exceptions.TemplateNotFound as e:
         print 'E Template not found: ' + str(e) + ' in template dir ' + template_dir
         sys.exit(2)
@@ -124,4 +129,4 @@ if __name__ == "__main__":
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
 
-    #generate_wellnesspage(template_dir, outputfile, summary, wellness)
+    generate_wellnesspage(template_dir, outputfile, summary, wellness)
