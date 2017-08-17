@@ -68,6 +68,14 @@ var myChart = new Chart(ctx, {
         {% endfor %}
     ],
     datasets: [{
+      label: 'sleeping',
+      data: [
+          {% for steps in summary['sleeping_steps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,153,0.4)"
+    }, {
       label: 'sedentary',
       data: [
           {% for steps in summary['sedentary_steps'] %}
@@ -99,14 +107,6 @@ var myChart = new Chart(ctx, {
           {% endfor %}
       ],
       backgroundColor: "rgba(153,153,153,0.4)"
-    }, {
-      label: 'sleeping',
-      data: [
-          {% for steps in summary['sleeping_steps'] %}
-              '{{ steps }}',
-          {% endfor %}
-      ],
-      backgroundColor: "rgba(0,0,153,0.4)"
     }, {
       label: 'totalsteps',
       data: [
