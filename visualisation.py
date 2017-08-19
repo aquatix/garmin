@@ -76,7 +76,11 @@ def parse_wellness(wellness, content):
         return wellness
 
     for item in content['allMetrics']['metricsMap']:
-        key = item.lstrip('WELLNESS_').lower()
+        if 'SLEEP_' in item:
+            key = item[len('SLEEP_'):].lower()
+        else:
+            key = item.lstrip('WELLNESS_').lower()
+        print(key)
         for value in content['allMetrics']['metricsMap'][item]:
             if key not in wellness:
                 wellness[key] = {}
