@@ -4,6 +4,7 @@
         <title>Garmin Wellness</title>
         <meta charset="utf-8"/>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css" />
 <style>
 body
 {
@@ -19,6 +20,10 @@ h2
     color: #AAA;
     border-bottom: 1px solid #AAA;
     clear: both;
+}
+ul
+{
+    list-style: none;
 }
 .contentblock
 {
@@ -48,6 +53,10 @@ h2
 .warning
 {
     color: #F00;
+}
+.goal
+{
+    color: #AAA;
 }
 </style>
     </head>
@@ -151,12 +160,13 @@ var myChart = new Chart(ctx, {
         </div>
 
         <div class="contentblock">
-        <p>Summary</p>
         <ul>
-            <li>Steps total: {{ wellness['total_steps'][datestamp] }}</li>
-            <li>Steps goal: {{ wellness['total_step_goal'][datestamp] }}</li>
-            <li>Floors ascended: {{ wellness['floors_ascended'][datestamp] }}</li>
-            <li>Floors descended: {{ wellness['floors_descended'][datestamp] }}</li>
+            <li><span title="Steps taken"><i class="fi-foot"></i> {{ wellness['total_steps'][datestamp] }}</span> / <span class="goal" title="Steps goal">{{ wellness['total_step_goal'][datestamp] }}</span></li>
+            <li><i class="fi-arrow-up"></i> <span title="Floors ascended">{{ wellness['floors_ascended'][datestamp] }}</span> / <span class="goal" title="Floors ascend goal">{{ wellness['user_floors_ascended_goal'][datestamp] }}</span> <i class="fi-arrow-down"></i> <span title="Floors descended">{{ wellness['floors_descended'][datestamp] }}</span></li>
+            <li title="BMR Calories"><i class="fi-lightbulb"></i> {{ wellness['bmr_calories'][datestamp] }}</li>
+            {% if wellness['vigorous_intensity_minutes'][datestamp] %}
+            <li><span title="Vigorous intensity"><i class="fi-fast-forward"></i> {{ wellness['vigorous_intensity_minutes'][datestamp] }} minutes</span></li>
+            {% endif %}
         </ul>
         </div>
         {% endfor %}
