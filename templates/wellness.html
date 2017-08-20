@@ -8,7 +8,7 @@
 <style>
 body
 {
-    background-color: #FFF;
+    background-color: #F2F2F2;
 }
 h1, h2, p, .contentblock
 {
@@ -94,7 +94,7 @@ var myChart = new Chart(ctx, {
               '{{ steps }}',
           {% endfor %}
       ],
-      backgroundColor: "rgba(0,0,153,0.4)"
+      backgroundColor: "rgba(0,0,153,0.9)"
     }, {
       label: 'sedentary',
       data: [
@@ -102,7 +102,7 @@ var myChart = new Chart(ctx, {
               '{{ steps }}',
           {% endfor %}
       ],
-      backgroundColor: "rgba(255,153,0,0.4)"
+      backgroundColor: "rgba(255,153,0,0.9)"
     }, {
       label: 'active',
       data: [
@@ -110,7 +110,7 @@ var myChart = new Chart(ctx, {
               '{{ steps }}',
           {% endfor %}
       ],
-      backgroundColor: "rgba(255,255,0,0.4)"
+      backgroundColor: "rgba(255,255,0,0.9)"
     }, {
       label: 'highly active',
       data: [
@@ -118,7 +118,7 @@ var myChart = new Chart(ctx, {
               '{{ steps }}',
           {% endfor %}
       ],
-      backgroundColor: "rgba(153,255,51,0.4)"
+      backgroundColor: "rgba(153,255,51,0.9)"
     }, {
       label: 'various',
       data: [
@@ -126,7 +126,7 @@ var myChart = new Chart(ctx, {
               '{{ steps }}',
           {% endfor %}
       ],
-      backgroundColor: "rgba(153,153,153,0.4)"
+      backgroundColor: "rgba(153,153,153,0.9)"
     }, {
       label: 'totalsteps',
       data: [
