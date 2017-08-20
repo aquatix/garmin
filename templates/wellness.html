@@ -179,11 +179,13 @@ var myChart = new Chart(ctx, {
             <li><span title="Moderate intensity"><i class="fi-play"></i> {{ wellness['moderate_intensity_minutes'][datestamp] }} minutes</span></li>
             {% endif %}
             <li><i class="fi-lightbulb"></i> <span title="Total Calories">{{ wellness['total_calories'][datestamp] }}</span> / <span title="Active Calories">{{ wellness['active_calories'][datestamp] }}</span> / <span title="BMR Calories">{{ wellness['bmr_calories'][datestamp] }}</span></li>
+            {% if wellness['max_heart_rate'] %}
             <li><i class="fi-heart"></i>
                 <span title="Max heart rate">{{ wellness['max_heart_rate'][datestamp] }}</span> /
                 <span title="Min heart rate">{{ wellness['min_heart_rate'][datestamp] }}</span> /
                 <span title="Resting heart rate">{{ wellness['resting_heart_rate'][datestamp] }}</span>
             </li>
+            {% endif %}
             {% if wellness['sleep_duration'][datestamp] %}
             <li title="Sleep duration"><i class="fi-battery-empty"></i> {{ (wellness['sleep_duration'][datestamp] / 3600) | round(1, 'common') }} hours</li>
             {% endif %}
