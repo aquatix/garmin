@@ -42,12 +42,12 @@ To download all your Garmin workouts in TCX format (basically XML), perform the 
    python download.py -c garmin_login.csv --start-date 2017-08-18 --end-date 2017-08-20 --displayname 1abcde23-f45a-678b-cdef-90123a45bcd
  ```
 
- Start date and end date can be the same date to only download one day. Displayname is the part of the url if you go to Activities > Steps on Garmin Connect and look at the part: ../daily-summary/<displayname>/2017-08-20/steps
+ Start date and end date can be the same date to only download one day. Displayname is the part of the url if you go to Activities > Steps on Garmin Connect and look at the part: ../daily-summary/[displayname]/2017-08-20/steps
 
- To visualise the downloaded wellness information, use `visualiation.py`, for example like:
+ To visualise the downloaded wellness information, use `visualisation.py`, for example like:
 
  ```
-    python visualisation.py -i /home/youruser/garmin/Results/youruser@example.com/Wellness -o /home/youruser/www/garmin
+   python visualisation.py -i /home/youruser/garmin/Results/youruser@example.com/Wellness -o /home/youruser/www/garmin
  ```
 
  This creates a file called wellness.html with graphs and statistics. Just open it with your browser, or upload it to your website.
