@@ -36,6 +36,22 @@ To download all your Garmin workouts in TCX format (basically XML), perform the 
 
  Again, you should see activities downloading in a few seconds.
 
+ To download wellness data (e.g., step count, calories burned, floors ascended and descended), use the download script as follows:
+
+ ```
+   python download.py -c garmin_login.csv --start-date 2017-08-18 --end-date 2017-08-20 --displayname 1abcde23-f45a-678b-cdef-90123a45bcd
+ ```
+
+ Start date and end date can be the same date to only download one day. Displayname is the part of the url if you go to Activities > Steps on Garmin Connect and look at the part: ../daily-summary/<displayname>/2017-08-20/steps
+
+ To visualise the downloaded wellness information, use `visualiation.py`, for example like:
+
+ ```
+    python visualisation.py -i /home/youruser/garmin/Results/youruser@example.com/Wellness -o /home/youruser/www/garmin
+ ```
+
+ This creates a file called wellness.html with graphs and statistics. Just open it with your browser, or upload it to your website.
+
 If you run into any problems, please create a ticket!
 
 Packages
@@ -48,3 +64,5 @@ If any of the following packages require dependencies, they will be listed. To i
  - **download.py**: A script for downloading all Garmin Connect data as TCX files for offline parsing. *Dependencies: mechanize*
 
  - **monthly.py**: A script for updating one's Twitter account with monthly statistics. Currently, the statistics and format are identical to those seen on [DailyMile](http://www.dailymile.com) for their weekly statistics. I just thought it'd be neat to have monthly updates, too. *Dependencies: tweepy, mechanize*
+
+ - **visualisation.py**: A script to generate graphs and statistics overviews from the Wellness data downloaded with download.py. *Dependencies: jinja2*
