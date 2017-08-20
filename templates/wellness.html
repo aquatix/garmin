@@ -157,6 +157,9 @@ var myChart = new Chart(ctx, {
               top: 0,
               bottom: 0
           }
+      },
+      animation: {
+          duration: 0
       }
   }
 });
@@ -169,20 +172,20 @@ var myChart = new Chart(ctx, {
             <li><span title="Steps taken"><i class="fi-foot"></i> {{ wellness['total_steps'][datestamp] }}</span> <span class="goal" title="Steps goal">/ {{ wellness['total_step_goal'][datestamp] }}</span></li>
             <li title="Total distance"><i class="fi-map"></i> {{ wellness['total_distance'][datestamp] }}m</li>
             <li><i class="fi-arrow-up"></i> <span title="Floors ascended">{{ wellness['floors_ascended'][datestamp] }}</span> <span class="goal" title="Floors ascend goal">/ {{ wellness['user_floors_ascended_goal'][datestamp] }}</span> <i class="fi-arrow-down"></i> <span title="Floors descended">{{ wellness['floors_descended'][datestamp] }}</span></li>
-            <li title="BMR Calories"><i class="fi-lightbulb"></i> {{ wellness['bmr_calories'][datestamp] }}</li>
             {% if wellness['vigorous_intensity_minutes'][datestamp] %}
             <li><span title="Vigorous intensity"><i class="fi-fast-forward"></i> {{ wellness['vigorous_intensity_minutes'][datestamp] }} minutes</span></li>
             {% endif %}
             {% if wellness['moderate_intensity_minutes'][datestamp] %}
             <li><span title="Moderate intensity"><i class="fi-play"></i> {{ wellness['moderate_intensity_minutes'][datestamp] }} minutes</span></li>
             {% endif %}
+            <li><i class="fi-lightbulb"></i> <span title="Total Calories">{{ wellness['total_calories'][datestamp] }}</span> / <span title="Active Calories">{{ wellness['active_calories'][datestamp] }}</span> / <span title="BMR Calories">{{ wellness['bmr_calories'][datestamp] }}</span></li>
             <li><i class="fi-heart"></i>
                 <span title="Max heart rate">{{ wellness['max_heart_rate'][datestamp] }}</span> /
                 <span title="Min heart rate">{{ wellness['min_heart_rate'][datestamp] }}</span> /
                 <span title="Resting heart rate">{{ wellness['resting_heart_rate'][datestamp] }}</span>
             </li>
             {% if wellness['sleep_duration'][datestamp] %}
-            <li title="Sleep duration"><i class="fi-battery-empty"></i> {{ wellness['sleep_duration'][datestamp] / 3600 }} hours</li>
+            <li title="Sleep duration"><i class="fi-battery-empty"></i> {{ (wellness['sleep_duration'][datestamp] / 3600) | round(1, 'common') }} hours</li>
             {% endif %}
         </ul>
         </div>
