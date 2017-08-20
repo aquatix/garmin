@@ -100,7 +100,6 @@ def parse_files(directory, target_directory):
                 content = json.load(f)
             summary.append((filename.split('_')[0], summary_to_graphdata(content)))
         elif filename.endswith(".json"):
-            print filename
             # parse wellness data
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
