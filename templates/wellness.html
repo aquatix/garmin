@@ -3,7 +3,7 @@
     <head>
         <title>Garmin Wellness</title>
         <meta charset="utf-8"/>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 <style>
@@ -137,6 +137,16 @@ var myChart = new Chart(ctx, {
           {% endfor %}
       ],
       borderColor: "rgba(0,0,0,0.4)",
+        type: 'line'
+    }, {
+      label: 'step goal',
+      data: [
+          {% for steps in summary['totalsteps'] %}
+              '{{ wellness['total_step_goal'][datestamp] }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,0,0.0)",
+      borderColor: "rgba(201, 203, 207,0.9)",
         type: 'line'
     },
     /*
