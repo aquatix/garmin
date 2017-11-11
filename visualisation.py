@@ -134,10 +134,10 @@ def generate_wellnesspage(template_dir, outputfile, summary, wellness):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description = 'Garmin Data Visualiser',
-        epilog = 'Because the hell with APIs!', add_help = 'How to use',
-        prog = 'python visualise.py -i <input dir with Wellness json files> -o <output dir>')
-    parser.add_argument('-i', '--input', required = False,
+    parser = argparse.ArgumentParser(description='Garmin Data Visualiser',
+        epilog='Because the hell with APIs!', add_help='How to use',
+        prog='python visualise.py -i <input dir with Wellness json files> -o <output dir>')
+    parser.add_argument('-i', '--input', required=False,
         help = 'Input directory.', default = os.path.join(os.getcwd(), 'Wellness/'))
     parser.add_argument('-o', '--output', required = False,
         help = 'Output directory.', default = os.path.join(os.getcwd(), 'Graphs/'))
