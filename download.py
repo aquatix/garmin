@@ -32,6 +32,7 @@ REDIRECT = "https://connect.garmin.com/post-auth/login"
 ACTIVITIES = "http://connect.garmin.com/proxy/activity-search-service-1.2/json/activities?start=%s&limit=%s"
 WELLNESS = "https://connect.garmin.com/modern/proxy/userstats-service/wellness/daily/%s?fromDate=%s&untilDate=%s"
 DAILYSUMMARY = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySummaryChart/%s?date=%s"
+STRESS = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailyStress/%s"
 
 
 TCX = "https://connect.garmin.com/modern/proxy/download-service/export/tcx/activity/%s"
@@ -178,6 +179,21 @@ def dailysummary(agent, date, display_name, outdir):
         f.write(content)
 
 
+def dailystress(agent, date, outdir):
+    url = STRESS % (date)
+    try:
+        response = agent.open(url)
+    except:
+        print('Wrong credentials for user {}. Skipping.'.format(username))
+        return
+    content = response.get_data()
+
+    file_name = '{}_stress.json'.format(date)
+    file_path = os.path.join(outdir, file_name)
+    with open(file_path, "w") as f:
+        f.write(content)
+
+
 def login_user(username, password):
     # Create the agent and log in.
     agent = me.Browser()
@@ -210,6 +226,8 @@ def download_wellness_for_user(agent, username, start_date, end_date, display_na
     wellness(agent, start_date, end_date, display_name, download_folder)
     # Daily summary does not do ranges, only fetch for `startdate`
     dailysummary(agent, start_date, display_name, download_folder)
+    # Daily stress does not do ranges, only fetch for `startdate`
+    dailystress(agent, start_date, download_folder)
 
 
 if __name__ == "__main__":
