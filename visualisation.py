@@ -91,6 +91,8 @@ def parse_wellness(wellness, content):
 
 
 def parse_files(directory, target_directory):
+    heartrate=[]
+    stress=[]
     summary = []
     wellness = {}
     for filename in sorted(os.listdir(directory)):
@@ -99,6 +101,12 @@ def parse_files(directory, target_directory):
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
             summary.append((filename.split('_')[0], summary_to_graphdata(content)))
+
+        elif filename.endswith("_stress.json"):
+            # parse summary, create graph
+            with open(os.path.join(directory, filename), 'r') as f:
+                content = json.load(f)
+            stress.append((filename.split('_')[0], stress_to_graphdata(content)))
         elif filename.endswith(".json"):
             # parse wellness data
             with open(os.path.join(directory, filename), 'r') as f:
