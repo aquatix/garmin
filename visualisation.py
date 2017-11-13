@@ -51,7 +51,7 @@ def summary_to_graphdata(content):
         highlyactive_steps = 0
         sedentary_steps = 0
         generic_steps = 0
-        datetimes.append(item['startGMT'])
+        datetimes.append(item['startGMT'] + 'Z')
         totalsteps = totalsteps + item['steps']
         totalsteps_list.append(totalsteps)
         if item['primaryActivityLevel'] == 'sedentary':
@@ -98,6 +98,12 @@ def stress_to_graphdata(content):
     return stress
 
 
+def sleep_to_graphdata(content):
+    return {'sleepEndTimestampLocal': python_to_string(content['sleepEndTimestampLocal']/1000),
+            'sleepStartTimestampLocal': python_to_string(content['sleepStartTimestampLocal']/1000),
+           }
+
+
 def parse_wellness(wellness, content):
     try:
         content['allMetrics']
@@ -121,8 +127,9 @@ def parse_wellness(wellness, content):
 
 
 def parse_files(directory, target_directory):
-    heartrate={}
-    stress={}
+    heartrate = {}
+    stress = {}
+    sleep = {}
     summary = []
     wellness = {}
     for filename in sorted(os.listdir(directory)):
@@ -141,6 +148,11 @@ def parse_files(directory, target_directory):
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
             stress[filename.split('_')[0]] = stress_to_graphdata(content)
+        elif filename.endswith("_sleep.json"):
+            # parse stress, create graph
+            with open(os.path.join(directory, filename), 'r') as f:
+                content = json.load(f)
+            sleep[filename.split('_')[0]] = sleep_to_graphdata(content)
         elif filename.endswith(".json"):
             # parse wellness data
             with open(os.path.join(directory, filename), 'r') as f:
@@ -152,7 +164,7 @@ def parse_files(directory, target_directory):
     # Reverse list so latest days are on top
     summary = summary[::-1]
 
-    return {'summaries': summary, 'wellness': wellness, 'heartrate': heartrate, 'stress': stress}
+    return {'summaries': summary, 'wellness': wellness, 'heartrate': heartrate, 'stress': stress, 'sleep': sleep}
 
 
 def generate_wellnesspage(template_dir, outputfile, alldata):
