@@ -91,6 +91,8 @@ var myChart = new Chart(ctx, {
     ],
     datasets: [{
       label: 'sleeping',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
       data: [
           {% for steps in summary['sleeping_steps'] %}
               '{{ steps }}',
@@ -99,6 +101,8 @@ var myChart = new Chart(ctx, {
       backgroundColor: "rgba(0,0,153,0.9)"
     }, {
       label: 'sedentary',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
       data: [
           {% for steps in summary['sedentary_steps'] %}
               '{{ steps }}',
@@ -107,6 +111,8 @@ var myChart = new Chart(ctx, {
       backgroundColor: "rgba(255,153,0,0.9)"
     }, {
       label: 'active',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
       data: [
           {% for steps in summary['active_steps'] %}
               '{{ steps }}',
@@ -115,6 +121,8 @@ var myChart = new Chart(ctx, {
       backgroundColor: "rgba(255,255,0,0.9)"
     }, {
       label: 'highly active',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
       data: [
           {% for steps in summary['highlyactive_steps'] %}
               '{{ steps }}',
@@ -123,6 +131,8 @@ var myChart = new Chart(ctx, {
       backgroundColor: "rgba(153,255,51,0.9)"
     }, {
       label: 'various',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
       data: [
           {% for steps in summary['generic_steps'] %}
               '{{ steps }}',
@@ -131,6 +141,8 @@ var myChart = new Chart(ctx, {
       backgroundColor: "rgba(153,153,153,0.9)"
     }, {
       label: 'totalsteps',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
       data: [
           {% for steps in summary['totalsteps'] %}
               '{{ steps }}',
@@ -140,6 +152,8 @@ var myChart = new Chart(ctx, {
         type: 'line'
     }, {
       label: 'step goal',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
       data: [
           {% for steps in summary['totalsteps'] %}
               '{{ wellness['total_step_goal'][datestamp] }}',
@@ -148,7 +162,31 @@ var myChart = new Chart(ctx, {
       backgroundColor: "rgba(0,0,0,0.0)",
       borderColor: "rgba(201, 203, 207,0.9)",
         type: 'line'
-    },
+    }, {
+      label: 'stress level',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-2",
+      data: [
+          {% for timestamp, level in stress[datestamp] %}
+              '{{ level }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,0,0.0)",
+      borderColor: "rgba(101, 103, 107,0.5)",
+        type: 'line'
+    }, {
+      label: 'heart rate',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-2",
+      data: [
+          {% for timestamp, level in heartrate[datestamp] %}
+              '{{ level }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,0,0.0)",
+      borderColor: "rgba(201, 0, 0,0.9)",
+        type: 'line'
+    }
     /*
                 "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
             "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
@@ -160,7 +198,25 @@ var myChart = new Chart(ctx, {
       scales: {
           xAxes: [{
               type: 'time',
-          }]
+              id: "x-axis-1",
+          }],
+            yAxes: [{
+                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                display: true,
+                position: "left",
+                id: "y-axis-1",
+            }, {
+                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                display: true,
+                position: "right",
+                //reverse: true,
+                id: "y-axis-2",
+
+                // grid line settings
+                gridLines: {
+                    drawOnChartArea: false, // only want the grid lines for one axis to show up
+                },
+            }],
       },
       layout: {
           padding: {

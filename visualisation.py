@@ -1,9 +1,21 @@
 import argparse
+from datetime import datetime
 import json
 import os
 import sys
 
 import jinja2
+
+
+def unix_to_python(timestamp):
+    return datetime.utcfromtimestamp(float(timestamp))
+
+
+def python_to_string(timestamp, dt_format='%Y-%m-%dT%H:%M:%S.0'):
+    """
+    Example: 2017-11-11T03:30:00.0
+    """
+    return datetime.fromtimestamp(int(timestamp)).strftime(dt_format)
 
 
 def add_totalsteps_to_summary(content):
@@ -69,6 +81,22 @@ def summary_to_graphdata(content):
             'generic_steps': generic_steps_list}
 
 
+def heartrate_to_graphdata(content):
+    values = content['heartRateValues']
+    rates = []
+    for value in values:
+        rates.append([python_to_string(value[0]/1000), value[1]])
+    return rates
+
+
+def stress_to_graphdata(content):
+    values = content['stressValuesArray']
+    stress = []
+    for value in values:
+        stress.append([python_to_string(value[0]/1000), value[1]])
+    return stress
+
+
 def parse_wellness(wellness, content):
     try:
         content['allMetrics']
@@ -92,8 +120,8 @@ def parse_wellness(wellness, content):
 
 
 def parse_files(directory, target_directory):
-    heartrate=[]
-    stress=[]
+    heartrate={}
+    stress={}
     summary = []
     wellness = {}
     for filename in sorted(os.listdir(directory)):
@@ -106,12 +134,12 @@ def parse_files(directory, target_directory):
             # parse heartrate, create graph
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
-            heartrate.append((filename.split('_')[0], heartrate_to_graphdata(content)))
+            heartrate[filename.split('_')[0]] = heartrate_to_graphdata(content)
         elif filename.endswith("_stress.json"):
             # parse stress, create graph
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
-            stress.append((filename.split('_')[0], stress_to_graphdata(content)))
+            stress[filename.split('_')[0]] = stress_to_graphdata(content)
         elif filename.endswith(".json"):
             # parse wellness data
             with open(os.path.join(directory, filename), 'r') as f:
@@ -123,10 +151,10 @@ def parse_files(directory, target_directory):
     # Reverse list so latest days are on top
     summary = summary[::-1]
 
-    return summary, wellness
+    return {'summaries': summary, 'wellness': wellness, 'heartrate': heartrate, 'stress': stress}
 
 
-def generate_wellnesspage(template_dir, outputfile, summary, wellness):
+def generate_wellnesspage(template_dir, outputfile, alldata):
     """ Generate graphs for the various measurements"""
     loader = jinja2.FileSystemLoader(template_dir)
     environment = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
@@ -137,23 +165,19 @@ def generate_wellnesspage(template_dir, outputfile, summary, wellness):
         print 'E Template not found: ' + str(e) + ' in template dir ' + template_dir
         sys.exit(2)
 
-    data = {}
-    data['summaries'] = summary
-    data['wellness'] = wellness
-
-    output = template.render(data)
+    output = template.render(alldata)
     with open(outputfile, 'w') as pf:
         pf.write(output)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Garmin Data Visualiser',
-        epilog='Because the hell with APIs!', add_help='How to use',
-        prog='python visualise.py -i <input dir with Wellness json files> -o <output dir>')
+                                     epilog='Because the hell with APIs!', add_help='How to use',
+                                     prog='python visualise.py -i <input dir with Wellness json files> -o <output dir>')
     parser.add_argument('-i', '--input', required=False,
-        help = 'Input directory.', default = os.path.join(os.getcwd(), 'Wellness/'))
-    parser.add_argument('-o', '--output', required = False,
-        help = 'Output directory.', default = os.path.join(os.getcwd(), 'Graphs/'))
+                        help='Input directory.', default=os.path.join(os.getcwd(), 'Wellness/'))
+    parser.add_argument('-o', '--output', required=False,
+                        help='Output directory.', default=os.path.join(os.getcwd(), 'Graphs/'))
     args = vars(parser.parse_args())
 
     # Sanity check, before we do anything:
@@ -164,7 +188,7 @@ if __name__ == "__main__":
     # Try to use the user argument from command line
     outputdir = args['output']
     inputdir = args['input']
-    summary, wellness = parse_files(inputdir, outputdir)
+    alldata = parse_files(inputdir, outputdir)
     template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
     outputfile = os.path.join(outputdir, 'wellness.html')
 
@@ -172,4 +196,4 @@ if __name__ == "__main__":
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
 
-    generate_wellnesspage(template_dir, outputfile, summary, wellness)
+    generate_wellnesspage(template_dir, outputfile, alldata)
