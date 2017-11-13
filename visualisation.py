@@ -101,9 +101,13 @@ def parse_files(directory, target_directory):
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
             summary.append((filename.split('_')[0], summary_to_graphdata(content)))
-
+        elif filename.endswith("_heartrate.json"):
+            # parse heartrate, create graph
+            with open(os.path.join(directory, filename), 'r') as f:
+                content = json.load(f)
+            heartrate.append((filename.split('_')[0], heartrate_to_graphdata(content)))
         elif filename.endswith("_stress.json"):
-            # parse summary, create graph
+            # parse stress, create graph
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
             stress.append((filename.split('_')[0], stress_to_graphdata(content)))
