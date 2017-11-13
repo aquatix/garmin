@@ -35,6 +35,7 @@ WELLNESS = "https://connect.garmin.com/modern/proxy/userstats-service/wellness/d
 DAILYSUMMARY = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySummaryChart/%s?date=%s"
 STRESS = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailyStress/%s"
 HEARTRATE = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailyHeartRate/%s?date=%s"
+SLEEP = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySleep/user/%s?date=%s"
 
 TCX = "https://connect.garmin.com/modern/proxy/download-service/export/tcx/activity/%s"
 GPX = "https://connect.garmin.com/modern/proxy/download-service/export/gpx/activity/%s"
@@ -211,6 +212,21 @@ def dailyheartrate(agent, date, display_name, outdir):
         f.write(content)
 
 
+def dailysleep(agent, date, display_name, outdir):
+    url = SLEEP % (display_name, date)
+    try:
+        response = agent.open(url)
+    except:
+        print('Wrong credentials for user {}. Skipping daily sleep.'.format(username))
+        return
+    content = response.get_data()
+
+    file_name = '{}_sleep.json'.format(date)
+    file_path = os.path.join(outdir, file_name)
+    with open(file_path, "w") as f:
+        f.write(content)
+
+
 def login_user(username, password):
     # Create the agent and log in.
     agent = me.Browser()
@@ -245,6 +261,7 @@ def download_wellness_for_user(agent, username, start_date, end_date, display_na
     dailysummary(agent, start_date, display_name, download_folder)
     dailystress(agent, start_date, download_folder)
     dailyheartrate(agent, start_date, display_name, download_folder)
+    dailysleep(agent, start_date, display_name, download_folder)
 
 
 if __name__ == "__main__":
