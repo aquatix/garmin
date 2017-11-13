@@ -161,8 +161,29 @@ var myChart = new Chart(ctx, {
       ],
       backgroundColor: "rgba(0,0,0,0.0)",
       borderColor: "rgba(201, 203, 207,0.9)",
-        type: 'line'
+      type: 'line'
     }, {
+{% if sleep[datestamp] %}
+      label: 'sleep',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+            {
+                x: '{{ sleep[datestamp]['sleepEndTimestampLocal'] }}',
+                y: 0
+            },
+            {
+                x: '{{ sleep[datestamp]['sleepStartTimestampLocal'] }}',
+                y: 0
+            }
+      ],
+      backgroundColor: "rgba(0,0,0,0.0)",
+      borderColor: "rgba(0, 0, 0, 1.0)",
+      type: 'line',
+      pointRadius: 10, // render a really big point
+      spanGaps: false
+    }, {
+{% endif %}
       label: 'stress level',
       xAxisID: "x-axis-1",
       yAxisID: "y-axis-2",
