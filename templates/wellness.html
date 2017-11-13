@@ -11,7 +11,7 @@ body
 {
     background-color: #F2F2F2;
 }
-h1, h2, p, .contentblock
+h1, h2, p, .contentblock, .contentmeta
 {
     font-family: Verdana, sans-serif;
     color: #141414;
@@ -32,9 +32,9 @@ ul
 {
     list-style: none;
 }
-.contentblock
+.contentblock, .contentmeta
 {
-    width: 800px;
+    width: 1200px;
     float: left;
     padding: 5px;
     margin-bottom: 10px;
@@ -42,16 +42,16 @@ ul
 /*    background-color: #1f1d1d;
     border: 1px solid #292929;*/
 }
-.contentblock h2
+.contentmeta
 {
-    font-weight: normal;
+    width: 600px;
 }
-.contentblock p
+.contentmeta p
 {
     font-size: .75em;
     margin: 0;
 }
-.contentblock td
+.contentmeta td
 {
     background-color: #141414;
     font-size: .6em;
@@ -168,7 +168,10 @@ var myChart = new Chart(ctx, {
       yAxisID: "y-axis-2",
       data: [
           {% for timestamp, level in stress[datestamp] %}
-              '{{ level }}',
+              {
+                  x: '{{ timestamp }}',
+                  y: '{{ level }}',
+              },
           {% endfor %}
       ],
       backgroundColor: "rgba(0,0,0,0.0)",
@@ -180,7 +183,10 @@ var myChart = new Chart(ctx, {
       yAxisID: "y-axis-2",
       data: [
           {% for timestamp, level in heartrate[datestamp] %}
-              '{{ level }}',
+              {
+                  x: '{{ timestamp }}',
+                  y: '{{ level }}',
+              },
           {% endfor %}
       ],
       backgroundColor: "rgba(0,0,0,0.0)",
@@ -235,7 +241,7 @@ var myChart = new Chart(ctx, {
 
         </div>
 
-        <div class="contentblock">
+        <div class="contentmeta">
         <ul>
             <li><span title="Steps taken"><i class="fi-foot" aria-hidden="true"></i> {{ wellness['total_steps'][datestamp] }}</span> <span class="goal" title="Steps goal">/ {{ wellness['total_step_goal'][datestamp] }}</span></li>
             <li title="Total distance"><i class="fa fa-map" aria-hidden="true"></i> {{ wellness['total_distance'][datestamp] }}m</li>

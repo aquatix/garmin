@@ -93,7 +93,8 @@ def stress_to_graphdata(content):
     values = content['stressValuesArray']
     stress = []
     for value in values:
-        stress.append([python_to_string(value[0]/1000), value[1]])
+        if value[1] > 0:
+            stress.append([python_to_string(value[0]/1000), value[1]])
     return stress
 
 
