@@ -157,7 +157,7 @@ def wellness(agent, start_date, end_date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping.'.format(username))
+        print('Wrong credentials for user {}. Skipping wellness for {}.'.format(username, start_date))
         return
     content = response.get_data()
 
@@ -172,7 +172,7 @@ def dailysummary(agent, date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping.'.format(username))
+        print('Wrong credentials for user {}. Skipping daily summary for {}.'.format(username, date))
         return
     content = response.get_data()
 
@@ -187,7 +187,7 @@ def dailystress(agent, date, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping.'.format(username))
+        print('Wrong credentials for user {}. Skipping daily stress for {}.'.format(username, date))
         return
     content = response.get_data()
 
@@ -202,7 +202,7 @@ def dailyheartrate(agent, date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping.'.format(username))
+        print('Wrong credentials for user {}. Skipping daily heart rate for {}.'.format(username, date))
         return
     content = response.get_data()
 
@@ -217,7 +217,7 @@ def dailysleep(agent, date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping daily sleep.'.format(username))
+        print('Wrong credentials for user {}. Skipping daily sleep for {}.'.format(username, date))
         return
     content = response.get_data()
 
