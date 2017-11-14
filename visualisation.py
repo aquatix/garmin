@@ -99,8 +99,11 @@ def stress_to_graphdata(content):
 
 
 def sleep_to_graphdata(content):
-    return {'sleepEndTimestampLocal': python_to_string(content['sleepEndTimestampLocal']/1000),
-            'sleepStartTimestampLocal': python_to_string(content['sleepStartTimestampLocal']/1000),
+    #return {'sleepEndTimestampLocal': python_to_string(content['sleepEndTimestampLocal']/1000),
+    #        'sleepStartTimestampLocal': python_to_string(content['sleepStartTimestampLocal']/1000),
+    #       }
+    return {'sleepEndTimestamp': python_to_string(content['sleepEndTimestampGMT']/1000),
+            'sleepStartTimestamp': python_to_string(content['sleepStartTimestampGMT']/1000),
            }
 
 

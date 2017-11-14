@@ -168,12 +168,12 @@ var myChart = new Chart(ctx, {
       xAxisID: "x-axis-1",
       yAxisID: "y-axis-1",
       data: [
-            {
-                x: '{{ sleep[datestamp]['sleepStartTimestampLocal'] }}',
+            /*{
+                x: '{{ sleep[datestamp]['sleepStartTimestamp'] }}',
                 y: 0
-            },
+            },*/
             {
-                x: '{{ sleep[datestamp]['sleepEndTimestampLocal'] }}',
+                x: '{{ sleep[datestamp]['sleepEndTimestamp'] }}',
                 y: 0
             }
       ],
