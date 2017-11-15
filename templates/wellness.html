@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Garmin Wellness</title>
+        <meta charset="utf-8"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+<style>
+body
+{
+    background-color: #F2F2F2;
+}
+h1, h2, p, .contentblock, .contentmeta
+{
+    font-family: Verdana, sans-serif;
+    color: #141414;
+}
+h2
+{
+    color: #AAA;
+    border-bottom: 1px solid #AAA;
+    clear: both;
+}
+i
+{
+    width: 2em;
+    display: inline-block;
+    text-align: center;
+}
+ul
+{
+    list-style: none;
+}
+.contentblock, .contentmeta
+{
+    width: 1200px;
+    float: left;
+    padding: 5px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+/*    background-color: #1f1d1d;
+    border: 1px solid #292929;*/
+}
+.contentmeta
+{
+    width: 600px;
+}
+.contentmeta p
+{
+    font-size: .75em;
+    margin: 0;
+}
+.contentmeta td
+{
+    background-color: #141414;
+    font-size: .6em;
+    color: #D8D9DA;
+}
+.warning
+{
+    color: #F00;
+}
+.goal
+{
+    color: #AAA;
+}
+</style>
+    </head>
+    <body>
+
+        <h1>Garmin Wellness</h1>
+
+        {% for datestamp, summary in summaries %}
+
+        <h2>{{ datestamp }}</h2>
+        <div class="contentblock">
+
+        <canvas id="{{ datestamp }}"></canvas>
+
+
+        <script>
+var ctx = document.getElementById('{{ datestamp }}').getContext('2d');
+var myChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: [
+        {% for datetime in summary['datetime'] %}
+            '{{ datetime }}',
+        {% endfor %}
+    ],
+    datasets: [{
+      label: 'sleeping',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+          {% for steps in summary['sleeping_steps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,153,0.9)"
+    }, {
+      label: 'sedentary',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+          {% for steps in summary['sedentary_steps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(255,153,0,0.9)"
+    }, {
+      label: 'active',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+          {% for steps in summary['active_steps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(255,255,0,0.9)"
+    }, {
+      label: 'highly active',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+          {% for steps in summary['highlyactive_steps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(153,255,51,0.9)"
+    }, {
+      label: 'various',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+          {% for steps in summary['generic_steps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(153,153,153,0.9)"
+    }, {
+      label: 'totalsteps',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+          {% for steps in summary['totalsteps'] %}
+              '{{ steps }}',
+          {% endfor %}
+      ],
+      borderColor: "rgba(0,0,0,0.4)",
+        type: 'line'
+    }, {
+      label: 'step goal',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+          {% for steps in summary['totalsteps'] %}
+              '{{ wellness['total_step_goal'][datestamp] }}',
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,0,0.0)",
+      borderColor: "rgba(201, 203, 207,0.9)",
+      type: 'line'
+    }, {
+{% if sleep[datestamp] %}
+      label: 'sleep',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-1",
+      data: [
+            /*{
+                x: '{{ sleep[datestamp]['sleepStartTimestamp'] }}',
+                y: 0
+            },*/
+            {
+                x: '{{ sleep[datestamp]['sleepEndTimestamp'] }}',
+                y: 0
+            }
+      ],
+      backgroundColor: "rgba(0,0,0,0.0)",
+      borderColor: "rgba(0, 0, 0, 1.0)",
+      type: 'line',
+      pointRadius: 10, // render a really big point
+      spanGaps: false
+    }, {
+{% endif %}
+      label: 'stress level',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-2",
+      data: [
+          {% for timestamp, level in stress[datestamp] %}
+              {
+                  x: '{{ timestamp }}',
+                  y: '{{ level }}',
+              },
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,0,0.0)",
+      borderColor: "rgba(101, 103, 107,0.5)",
+      type: 'line',
+      hidden: true,
+      pointRadius: 1, // render a really small point
+      pointHitRadius: 10,
+      spanGaps: false
+    }, {
+      label: 'heart rate',
+      xAxisID: "x-axis-1",
+      yAxisID: "y-axis-2",
+      data: [
+          {% for timestamp, level in heartrate[datestamp] %}
+              {
+                  x: '{{ timestamp }}',
+                  y: '{{ level }}',
+              },
+          {% endfor %}
+      ],
+      backgroundColor: "rgba(0,0,0,0.0)",
+      borderColor: "rgba(201, 0, 0,0.9)",
+      type: 'line',
+      pointRadius: 1, // render a really small point
+      pointHitRadius: 10,
+      spanGaps: false
+    }
+    /*
+                "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
+            "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
+            "borderWidth": 1
+*/
+    ]
+  },
+  options: {
+      scales: {
+          xAxes: [{
+              type: 'time',
+              id: "x-axis-1",
+          }],
+            yAxes: [{
+                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                display: true,
+                position: "left",
+                id: "y-axis-1",
+            }, {
+                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                display: true,
+                position: "right",
+                //reverse: true,
+                id: "y-axis-2",
+
+                // grid line settings
+                gridLines: {
+                    drawOnChartArea: false, // only want the grid lines for one axis to show up
+                },
+            }],
+      },
+      layout: {
+          padding: {
+              left: 50,
+              right: 0,
+              top: 0,
+              bottom: 0
+          }
+      },
+      animation: {
+          duration: 0
+      }
+  }
+});
+        </script>
+
+        </div>
+
+        <div class="contentmeta">
+        <ul>
+            <li><span title="Steps taken"><i class="fi-foot" aria-hidden="true"></i> {{ wellness['total_steps'][datestamp] }}</span> <span class="goal" title="Steps goal">/ {{ wellness['total_step_goal'][datestamp] }}</span></li>
+            <li title="Total distance"><i class="fa fa-map" aria-hidden="true"></i> {{ wellness['total_distance'][datestamp] }}m</li>
+            <li><i class="fa fa-arrow-up" aria-hidden="true"></i> <span title="Floors ascended">{{ wellness['floors_ascended'][datestamp] }}</span> <span class="goal" title="Floors ascend goal">/ {{ wellness['user_floors_ascended_goal'][datestamp] }}</span> <i class="fa fa-arrow-down" aria-hidden="true"></i> <span title="Floors descended">{{ wellness['floors_descended'][datestamp] }}</span></li>
+            {% if wellness['vigorous_intensity_minutes'][datestamp] %}
+            <li><span title="Vigorous intensity"><i class="fa fa-forward" aria-hidden="true"></i> {{ wellness['vigorous_intensity_minutes'][datestamp] }} minutes</span></li>
+            {% endif %}
+            {% if wellness['moderate_intensity_minutes'][datestamp] %}
+            <li><span title="Moderate intensity"><i class="fa fa-play" aria-hidden="true"></i> {{ wellness['moderate_intensity_minutes'][datestamp] }} minutes</span></li>
+            {% endif %}
+            <li><i class="fa fa-bolt" aria-hidden="true"></i> <span title="Total Calories">{{ wellness['total_calories'][datestamp] }}</span> / <span title="Active Calories">{{ wellness['active_calories'][datestamp] }}</span> / <span title="BMR Calories">{{ wellness['bmr_calories'][datestamp] }}</span></li>
+            {% if wellness['max_heart_rate'] %}
+            <li><i class="fa fa-heartbeat" aria-hidden="true"></i>
+                <span title="Max heart rate">{{ wellness['max_heart_rate'][datestamp] }}</span> /
+                <span title="Min heart rate">{{ wellness['min_heart_rate'][datestamp] }}</span> /
+                <span title="Resting heart rate">{{ wellness['resting_heart_rate'][datestamp] }}</span>
+            </li>
+            {% endif %}
+            {% if wellness['sleep_duration'][datestamp] %}
+            <li title="Sleep duration"><i class="fa fa-bed" aria-hidden="true"></i> {{ (wellness['sleep_duration'][datestamp] / 3600) | round(1, 'common') }} hours</li>
+            {% endif %}
+        </ul>
+        </div>
+        {% endfor %}
+
+    </body>
+</html>

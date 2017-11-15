@@ -29,13 +29,17 @@ GAUTH = "https://connect.garmin.com/gauth/hostname"
 SSO = "https://sso.garmin.com/sso"
 CSS = "https://static.garmincdn.com/com.garmin.connect/ui/css/gauth-custom-v1.2-min.css"
 REDIRECT = "https://connect.garmin.com/post-auth/login"
+
 ACTIVITIES = "http://connect.garmin.com/proxy/activity-search-service-1.2/json/activities?start=%s&limit=%s"
 WELLNESS = "https://connect.garmin.com/modern/proxy/userstats-service/wellness/daily/%s?fromDate=%s&untilDate=%s"
 DAILYSUMMARY = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySummaryChart/%s?date=%s"
-
+STRESS = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailyStress/%s"
+HEARTRATE = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailyHeartRate/%s?date=%s"
+SLEEP = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySleep/user/%s?date=%s"
 
 TCX = "https://connect.garmin.com/modern/proxy/download-service/export/tcx/activity/%s"
 GPX = "https://connect.garmin.com/modern/proxy/download-service/export/gpx/activity/%s"
+
 
 def login(agent, username, password):
     global BASE_URL, GAUTH, REDIRECT, SSO, CSS
@@ -153,7 +157,7 @@ def wellness(agent, start_date, end_date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping.'.format(username))
+        print('Wrong credentials for user {}. Skipping wellness for {}.'.format(username, start_date))
         return
     content = response.get_data()
 
@@ -168,11 +172,56 @@ def dailysummary(agent, date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping.'.format(username))
+        print('Wrong credentials for user {}. Skipping daily summary for {}.'.format(username, date))
         return
     content = response.get_data()
 
     file_name = '{}_summary.json'.format(date)
+    file_path = os.path.join(outdir, file_name)
+    with open(file_path, "w") as f:
+        f.write(content)
+
+
+def dailystress(agent, date, outdir):
+    url = STRESS % (date)
+    try:
+        response = agent.open(url)
+    except:
+        print('Wrong credentials for user {}. Skipping daily stress for {}.'.format(username, date))
+        return
+    content = response.get_data()
+
+    file_name = '{}_stress.json'.format(date)
+    file_path = os.path.join(outdir, file_name)
+    with open(file_path, "w") as f:
+        f.write(content)
+
+
+def dailyheartrate(agent, date, display_name, outdir):
+    url = HEARTRATE % (display_name, date)
+    try:
+        response = agent.open(url)
+    except:
+        print('Wrong credentials for user {}. Skipping daily heart rate for {}.'.format(username, date))
+        return
+    content = response.get_data()
+
+    file_name = '{}_heartrate.json'.format(date)
+    file_path = os.path.join(outdir, file_name)
+    with open(file_path, "w") as f:
+        f.write(content)
+
+
+def dailysleep(agent, date, display_name, outdir):
+    url = SLEEP % (display_name, date)
+    try:
+        response = agent.open(url)
+    except:
+        print('Wrong credentials for user {}. Skipping daily sleep for {}.'.format(username, date))
+        return
+    content = response.get_data()
+
+    file_name = '{}_sleep.json'.format(date)
     file_path = os.path.join(outdir, file_name)
     with open(file_path, "w") as f:
         f.write(content)
@@ -208,8 +257,11 @@ def download_wellness_for_user(agent, username, start_date, end_date, display_na
 
     # Scrape all wellness data.
     wellness(agent, start_date, end_date, display_name, download_folder)
-    # Daily summary does not do ranges, only fetch for `startdate`
+    # Daily summary, stress and heart rate do not do ranges, only fetch for `startdate`
     dailysummary(agent, start_date, display_name, download_folder)
+    dailystress(agent, start_date, download_folder)
+    dailyheartrate(agent, start_date, display_name, download_folder)
+    dailysleep(agent, start_date, display_name, download_folder)
 
 
 if __name__ == "__main__":
