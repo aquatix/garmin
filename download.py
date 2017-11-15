@@ -42,6 +42,13 @@ TCX = "https://connect.garmin.com/modern/proxy/download-service/export/tcx/activ
 GPX = "https://connect.garmin.com/modern/proxy/download-service/export/gpx/activity/%s"
 
 
+def get_daterange(start_date, end_date):
+    """
+    Generate a list with dates of format yyyy-mm-dd from start_date to end_date
+    """
+    pass
+
+
 def login(agent, username, password):
     global BASE_URL, GAUTH, REDIRECT, SSO, CSS
 
