@@ -15,14 +15,15 @@ to be determined.
 """
 
 import argparse
-from getpass import getpass
 import json
-import mechanize as me
 import os
 import re
 import shutil
 import sys
 import urllib
+from getpass import getpass
+
+import mechanize as me
 
 BASE_URL = "http://connect.garmin.com/en-US/signin"
 GAUTH = "https://connect.garmin.com/gauth/hostname"
