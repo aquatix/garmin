@@ -16,6 +16,7 @@ to be determined.
 
 import argparse
 import json
+import logging
 import os
 import re
 import shutil
@@ -40,6 +41,33 @@ SLEEP = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/daily
 
 TCX = "https://connect.garmin.com/modern/proxy/download-service/export/tcx/activity/%s"
 GPX = "https://connect.garmin.com/modern/proxy/download-service/export/gpx/activity/%s"
+
+
+def get_logger():
+    """
+    Create logging handler
+    """
+    ## Create logger
+    logger = logging.getLogger('garmindownload')
+    logger.setLevel(logging.DEBUG)
+
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler('garmindownload.log')
+    fh.setLevel(logging.DEBUG)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(fh)
+
+    # create stdout logger
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.WARNING)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    return logger
 
 
 def get_daterange(start_date, end_date):
@@ -103,7 +131,7 @@ def login(agent, username, password):
     if res.get_data().find("Invalid") >= 0:
         quit("Login failed! Check your credentials, or submit a bug report.")
     elif res.get_data().find("SUCCESS") >= 0:
-        print('Login successful! Proceeding...')
+        logger.info('Login successful! Proceeding...')
     else:
         quit('UNKNOWN STATE. This script may need to be updated. Submit a bug report.')
 
@@ -127,7 +155,7 @@ def activities(agent, outdir, increment = 100):
     try:
         response = agent.open(initUrl)
     except:
-        print('Wrong credentials for user {}. Skipping.'.format(username))
+        logger.warning('Wrong credentials for user {}. Skipping.'.format(username))
         return
     search = json.loads(response.get_data())
     totalActivities = int(search['results']['totalFound'])
@@ -140,9 +168,9 @@ def activities(agent, outdir, increment = 100):
             url = TCX % activityId
             file_name = '{}_{}.txt'.format(activityDate, activityId)
             if file_exists_in_folder(file_name, output):
-                print('{} already exists in {}. Skipping.'.format(file_name, output))
+                logger.info('{} already exists in {}. Skipping.'.format(file_name, output))
                 continue
-            print('{} is downloading...'.format(file_name))
+            logger.info('{} is downloading...'.format(file_name))
             datafile = agent.open(url).get_data()
             file_path = os.path.join(outdir, file_name)
             f = open(file_path, "w")
@@ -165,7 +193,7 @@ def wellness(agent, start_date, end_date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping wellness for {}.'.format(username, start_date))
+        logger.warning('Wrong credentials for user {}. Skipping wellness for {}.'.format(username, start_date))
         return
     content = response.get_data()
 
@@ -180,7 +208,7 @@ def dailysummary(agent, date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping daily summary for {}.'.format(username, date))
+        logger.warning('Wrong credentials for user {}. Skipping daily summary for {}.'.format(username, date))
         return
     content = response.get_data()
 
@@ -195,7 +223,7 @@ def dailystress(agent, date, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping daily stress for {}.'.format(username, date))
+        logger.warning('Wrong credentials for user {}. Skipping daily stress for {}.'.format(username, date))
         return
     content = response.get_data()
 
@@ -210,7 +238,7 @@ def dailyheartrate(agent, date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping daily heart rate for {}.'.format(username, date))
+        logger.warning('Wrong credentials for user {}. Skipping daily heart rate for {}.'.format(username, date))
         return
     content = response.get_data()
 
@@ -225,7 +253,7 @@ def dailysleep(agent, date, display_name, outdir):
     try:
         response = agent.open(url)
     except:
-        print('Wrong credentials for user {}. Skipping daily sleep for {}.'.format(username, date))
+        logger.warning('Wrong credentials for user {}. Skipping daily sleep for {}.'.format(username, date))
         return
     content = response.get_data()
 
@@ -238,7 +266,7 @@ def dailysleep(agent, date, display_name, outdir):
 def login_user(username, password):
     # Create the agent and log in.
     agent = me.Browser()
-    print("Attempting to login to Garmin Connect...")
+    logger.info("Attempting to login to Garmin Connect...")
     login(agent, username, password)
     return agent
 
@@ -273,6 +301,8 @@ def download_wellness_for_user(agent, username, start_date, end_date, display_na
 
 
 if __name__ == "__main__":
+    logger = get_logger()
+
     parser = argparse.ArgumentParser(description = 'Garmin Data Scraper',
         epilog = 'Because the hell with APIs!', add_help = 'How to use',
         prog = 'python download.py [-u <user> | -c <csv fife with credentials>] [ -s <start_date> -e <end_date> -d <display_name> ] -o <output dir>')
@@ -297,7 +327,7 @@ if __name__ == "__main__":
 
     # Sanity check, before we do anything:
     if args['user'] is None and args['csv'] is None:
-        print("Must either specify a username (-u) or a CSV credentials file (-c).")
+        logger.error("Must either specify a username (-u) or a CSV credentials file (-c).")
         sys.exit()
 
     # Try to use the user argument from command line
@@ -309,18 +339,18 @@ if __name__ == "__main__":
     else:
         csv_file_path = args['csv']
         if not os.path.exists(csv_file_path):
-            print("Could not find specified credentials file \"{}\"".format(csv_file_path))
+            logger.error("Could not find specified credentials file \"{}\"".format(csv_file_path))
             sys.exit()
         try:
             with open(csv_file_path, 'r') as f:
                 contents = f.read()
         except IOError as e:
-            print(e)
+            logger.error(e)
             sys.exit()
         try:
             username, password = contents.strip().split(",")
         except IndexError:
-            print("CSV file must only have 1 line, in \"username,password\" format.")
+            logger.error("CSV file must only have 1 line, in \"username,password\" format.")
             sys.exit()
 
     # Perform the download.
@@ -329,10 +359,10 @@ if __name__ == "__main__":
         end_date = args['enddate']
         display_name = args['displayname']
         if not end_date:
-            print("Provide an enddate")
+            logger.error("Provide an enddate")
             sys.exit(1)
         if not display_name:
-            print("Provide a displayname, you can find it in the url of Daily Summary: '.../daily-summary/<displayname>/...'")
+            logger.error("Provide a displayname, you can find it in the url of Daily Summary: '.../daily-summary/<displayname>/...'")
             sys.exit(1)
         agent = login_user(username, password)
         download_wellness_for_user(agent, username, start_date, end_date, display_name, output)
