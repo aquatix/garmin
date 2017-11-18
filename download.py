@@ -383,6 +383,7 @@ if __name__ == "__main__":
         alldates = get_daterange(start_date, end_date)
         agent = login_user(username, password)
         for thisdate in alldates:
+            logger.info('Downloading all wellness for %s...', thisdate)
             download_wellness_for_user(agent, username, thisdate, display_name, output)
     else:
         agent = login_user(username, password)
