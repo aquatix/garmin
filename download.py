@@ -15,6 +15,7 @@ to be determined.
 """
 
 import argparse
+from datetime import datetime, timedelta
 import json
 import logging
 import os
@@ -70,11 +71,26 @@ def get_logger():
     return logger
 
 
+def daterange(start_date, end_date):
+    if start_date <= end_date:
+        for n in range((end_date - start_date).days + 1):
+            yield start_date + timedelta(n)
+    else:
+        for n in range((start_date - end_date).days + 1):
+            yield start_date - timedelta(n)
+
+
 def get_daterange(start_date, end_date):
     """
     Generate a list with dates of format yyyy-mm-dd from start_date to end_date
     """
-    pass
+    # Append a time to them so there's a smaller chance of error
+    start_datetime = datetime.strptime(start_date + ' 11:00', '%Y-%m-%d %H:%M')
+    end_datetime = datetime.strptime(end_date + ' 11:00', '%Y-%m-%d %H:%M')
+    dates = []
+    for date in daterange(start_datetime, end_datetime):
+        dates.append(date.strftime('%Y-%m-%d'))
+    return dates
 
 
 def login(agent, username, password):
@@ -188,8 +204,8 @@ def activities(agent, outdir, increment = 100):
         response = agent.open(url)
         search = json.loads(response.get_data())
 
-def wellness(agent, start_date, end_date, display_name, outdir):
-    url = WELLNESS % (display_name, start_date, end_date)
+def wellness(agent, start_date, display_name, outdir):
+    url = WELLNESS % (display_name, start_date, start_date)
     try:
         response = agent.open(url)
     except:
@@ -197,7 +213,7 @@ def wellness(agent, start_date, end_date, display_name, outdir):
         return
     content = response.get_data()
 
-    file_name = '{}_{}.json'.format(start_date, end_date)
+    file_name = '{}_wellness.json'.format(start_date)
     file_path = os.path.join(outdir, file_name)
     with open(file_path, "w") as f:
         f.write(content)
@@ -283,7 +299,7 @@ def download_files_for_user(agent, username, output):
     activities(agent, download_folder)
 
 
-def download_wellness_for_user(agent, username, start_date, end_date, display_name, output):
+def download_wellness_for_user(agent, username, start_date, display_name, output):
     user_output = os.path.join(output, username)
     download_folder = os.path.join(user_output, 'Wellness')
 
@@ -292,7 +308,7 @@ def download_wellness_for_user(agent, username, start_date, end_date, display_na
         os.makedirs(download_folder)
 
     # Scrape all wellness data.
-    wellness(agent, start_date, end_date, display_name, download_folder)
+    wellness(agent, start_date, display_name, download_folder)
     # Daily summary, stress and heart rate do not do ranges, only fetch for `startdate`
     dailysummary(agent, start_date, display_name, download_folder)
     dailystress(agent, start_date, download_folder)
@@ -364,8 +380,10 @@ if __name__ == "__main__":
         if not display_name:
             logger.error("Provide a displayname, you can find it in the url of Daily Summary: '.../daily-summary/<displayname>/...'")
             sys.exit(1)
+        alldates = get_daterange(start_date, end_date)
         agent = login_user(username, password)
-        download_wellness_for_user(agent, username, start_date, end_date, display_name, output)
+        for thisdate in alldates:
+            download_wellness_for_user(agent, username, thisdate, display_name, output)
     else:
         agent = login_user(username, password)
         download_files_for_user(agent, username, output)
