@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Garmin Wellness</title>
+        <title>Wellness stats for {{ datedayofweek }} {{ datestamp }}</title>
         <meta charset="utf-8"/>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css" />
@@ -69,11 +69,7 @@ ul
     </head>
     <body>
 
-        <h1>Garmin Wellness</h1>
-
-        {% for datestamp, summary in summaries %}
-
-        <h2>{{ datestamp }}</h2>
+        <h1>Wellness stats for {{ datedayofweek }} {{ datestamp }}</h1>
         <div class="contentblock">
 
         <canvas id="{{ datestamp }}"></canvas>
@@ -293,7 +289,6 @@ var myChart = new Chart(ctx, {
             {% endif %}
         </ul>
         </div>
-        {% endfor %}
 
     </body>
 </html>

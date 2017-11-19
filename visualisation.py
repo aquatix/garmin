@@ -99,14 +99,9 @@ def stress_to_graphdata(content):
 
 
 def sleep_to_graphdata(content):
-    try:
-        return {'sleepEndTimestamp': python_to_string(content['dailySleepDTO']['sleepEndTimestampLocal']/1000),
-                'sleepStartTimestamp': python_to_string(content['dailySleepDTO']['sleepStartTimestampLocal']/1000),
-               }
-    except TypeError:
-        return {'sleepEndTimestamp': python_to_string(content['dailySleepDTO']['sleepEndTimestampGMT']/1000),
-                'sleepStartTimestamp': python_to_string(content['dailySleepDTO']['sleepStartTimestampGMT']/1000),
-               }
+    return {'sleepEndTimestamp': python_to_string(content['dailySleepDTO']['sleepEndTimestampGMT']/1000),
+            'sleepStartTimestamp': python_to_string(content['dailySleepDTO']['sleepStartTimestampGMT']/1000),
+           }
 
 
 def parse_wellness(wellness, content):
@@ -199,9 +194,12 @@ def generate_dailystats(template_dir, outputdir, alldata):
         print 'E Template not found: ' + str(e) + ' in template dir ' + template_dir
         sys.exit(2)
 
-    for datestamp, _ in alldata['summaries']:
+    for datestamp, summary in alldata['summaries']:
         outputfile = os.path.join(outputdir, datestamp + '.html')
-        alldata['processingdate'] = datestamp
+        thisdate = datetime.strptime(datestamp, '%Y-%m-%d')
+        alldata['datedayofweek'] = thisdate.strftime('%A')  # Day of week, e.g., Sunday, Monday...
+        alldata['datestamp'] = datestamp
+        alldata['summary'] = summary
         output = template.render(alldata)
         with open(outputfile, 'w') as pf:
             pf.write(output)
