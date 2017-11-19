@@ -109,25 +109,25 @@ def login(agent, username, password):
 
     # Package the full login GET request...
     data = {'service': REDIRECT,
-        'webhost': hostname,
-        'source': BASE_URL,
-        'redirectAfterAccountLoginUrl': REDIRECT,
-        'redirectAfterAccountCreationUrl': REDIRECT,
-        'gauthHost': SSO,
-        'locale': 'en_US',
-        'id': 'gauth-widget',
-        'cssUrl': CSS,
-        'clientId': 'GarminConnect',
-        'rememberMeShown': 'true',
-        'rememberMeChecked': 'false',
-        'createAccountShown': 'true',
-        'openCreateAccount': 'false',
-        'usernameShown': 'false',
-        'displayNameShown': 'false',
-        'consumeServiceTicket': 'false',
-        'initialFocus': 'true',
-        'embedWidget': 'false',
-        'generateExtraServiceTicket': 'false'}
+            'webhost': hostname,
+            'source': BASE_URL,
+            'redirectAfterAccountLoginUrl': REDIRECT,
+            'redirectAfterAccountCreationUrl': REDIRECT,
+            'gauthHost': SSO,
+            'locale': 'en_US',
+            'id': 'gauth-widget',
+            'cssUrl': CSS,
+            'clientId': 'GarminConnect',
+            'rememberMeShown': 'true',
+            'rememberMeChecked': 'false',
+            'createAccountShown': 'true',
+            'openCreateAccount': 'false',
+            'usernameShown': 'false',
+            'displayNameShown': 'false',
+            'consumeServiceTicket': 'false',
+            'initialFocus': 'true',
+            'embedWidget': 'false',
+            'generateExtraServiceTicket': 'false'}
 
     # ...and officially say "hello" to Garmin Connect.
     login_url = 'https://sso.garmin.com/sso/login?%s' % urllib.urlencode(data)
@@ -319,26 +319,26 @@ def download_wellness_for_user(agent, username, start_date, display_name, output
 if __name__ == "__main__":
     logger = get_logger()
 
-    parser = argparse.ArgumentParser(description = 'Garmin Data Scraper',
-        epilog = 'Because the hell with APIs!', add_help = 'How to use',
-        prog = 'python download.py [-u <user> | -c <csv fife with credentials>] [ -s <start_date> -e <end_date> -d <display_name> ] -o <output dir>')
-    parser.add_argument('-u', '--user', required = False,
-        help = 'Garmin username. This will NOT be saved!',
-        default = None)
-    parser.add_argument('-c', '--csv', required = False,
-        help = 'CSV file with username and password in "username,password" format.',
-        default = None)
-    parser.add_argument('-s', '--startdate', required = False,
-        help = 'Start date for wellness data',
-        default = None)
-    parser.add_argument('-e', '--enddate', required = False,
-        help = 'End date for wellness data',
-        default = None)
-    parser.add_argument('-d', '--displayname', required = False,
-        help = 'Displayname (see the url when logged into Garmin Connect)',
-        default = None)
-    parser.add_argument('-o', '--output', required = False,
-        help = 'Output directory.', default = os.path.join(os.getcwd(), 'Results/'))
+    parser = argparse.ArgumentParser(description='Garmin Data Scraper',
+                                     epilog='Because the hell with APIs!', add_help='How to use',
+                                     prog='python download.py [-u <user> | -c <csv fife with credentials>] [ -s <start_date> -e <end_date> -d <display_name> ] -o <output dir>')
+    parser.add_argument('-u', '--user', required=False,
+                        help='Garmin username. This will NOT be saved!',
+                        default=None)
+    parser.add_argument('-c', '--csv', required=False,
+                        help='CSV file with username and password in "username,password" format.',
+                        default=None)
+    parser.add_argument('-s', '--startdate', required=False,
+                        help='Start date for wellness data',
+                        default=None)
+    parser.add_argument('-e', '--enddate', required=False,
+                        help='End date for wellness data',
+                        default=None)
+    parser.add_argument('-d', '--displayname', required=False,
+                        help='Displayname (see the url when logged into Garmin Connect)',
+                        default=None)
+    parser.add_argument('-o', '--output', required=False,
+                        help='Output directory.', default=os.path.join(os.getcwd(), 'Results/'))
     args = vars(parser.parse_args())
 
     # Sanity check, before we do anything:
@@ -355,7 +355,7 @@ if __name__ == "__main__":
     else:
         csv_file_path = args['csv']
         if not os.path.exists(csv_file_path):
-            logger.error("Could not find specified credentials file \"{}\"".format(csv_file_path))
+            logger.error("Could not find specified credentials file \"%s\"", csv_file_path)
             sys.exit()
         try:
             with open(csv_file_path, 'r') as f:
