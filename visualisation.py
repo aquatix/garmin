@@ -99,12 +99,14 @@ def stress_to_graphdata(content):
 
 
 def sleep_to_graphdata(content):
-    #return {'sleepEndTimestampLocal': python_to_string(content['sleepEndTimestampLocal']/1000),
-    #        'sleepStartTimestampLocal': python_to_string(content['sleepStartTimestampLocal']/1000),
-    #       }
-    return {'sleepEndTimestamp': python_to_string(content['sleepEndTimestampGMT']/1000),
-            'sleepStartTimestamp': python_to_string(content['sleepStartTimestampGMT']/1000),
-           }
+    try:
+        return {'sleepEndTimestamp': python_to_string(content['dailySleepDTO']['sleepEndTimestampLocal']/1000),
+                'sleepStartTimestamp': python_to_string(content['dailySleepDTO']['sleepStartTimestampLocal']/1000),
+               }
+    except TypeError:
+        return {'sleepEndTimestamp': python_to_string(content['dailySleepDTO']['sleepEndTimestampGMT']/1000),
+                'sleepStartTimestamp': python_to_string(content['dailySleepDTO']['sleepStartTimestampGMT']/1000),
+               }
 
 
 def parse_wellness(wellness, content):
@@ -186,6 +188,25 @@ def generate_wellnesspage(template_dir, outputfile, alldata):
         pf.write(output)
 
 
+def generate_dailystats(template_dir, outputdir, alldata):
+    """ Generate graphs for the various measurements """
+    loader = jinja2.FileSystemLoader(template_dir)
+    environment = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
+
+    try:
+        template = environment.get_template('dailystats.html')
+    except jinja2.exceptions.TemplateNotFound as e:
+        print 'E Template not found: ' + str(e) + ' in template dir ' + template_dir
+        sys.exit(2)
+
+    for datestamp, _ in alldata['summaries']:
+        outputfile = os.path.join(outputdir, datestamp + '.html')
+        alldata['processingdate'] = datestamp
+        output = template.render(alldata)
+        with open(outputfile, 'w') as pf:
+            pf.write(output)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Garmin Data Visualiser',
                                      epilog='Because the hell with APIs!', add_help='How to use',
@@ -206,10 +227,11 @@ if __name__ == "__main__":
     inputdir = args['input']
     alldata = parse_files(inputdir, outputdir)
     template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
-    outputfile = os.path.join(outputdir, 'wellness.html')
+    #outputfile = os.path.join(outputdir, 'wellness.html')
 
     # Create output directory (if it does not already exist).
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
 
-    generate_wellnesspage(template_dir, outputfile, alldata)
+    #generate_wellnesspage(template_dir, outputfile, alldata)
+    generate_dailystats(template_dir, outputdir, alldata)
