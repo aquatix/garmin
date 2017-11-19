@@ -38,7 +38,7 @@ WELLNESS = "https://connect.garmin.com/modern/proxy/userstats-service/wellness/d
 DAILYSUMMARY = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySummaryChart/%s?date=%s"
 STRESS = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailyStress/%s"
 HEARTRATE = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailyHeartRate/%s?date=%s"
-SLEEP = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySleep/user/%s?date=%s"
+SLEEP = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySleepData/%s?date=%s&nonSleepBufferMinutes=60"
 
 TCX = "https://connect.garmin.com/modern/proxy/download-service/export/tcx/activity/%s"
 GPX = "https://connect.garmin.com/modern/proxy/download-service/export/gpx/activity/%s"
