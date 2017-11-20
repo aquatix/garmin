@@ -1,10 +1,38 @@
 import argparse
 from datetime import datetime
 import json
+import logging
 import os
 import sys
 
 import jinja2
+
+
+def get_logger():
+    """
+    Create logging handler
+    """
+    ## Create logger
+    logger = logging.getLogger('garminvisualisation')
+    logger.setLevel(logging.DEBUG)
+
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler('garminvisualisation.log')
+    fh.setLevel(logging.DEBUG)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(fh)
+
+    # create stdout logger
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.WARNING)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    return logger
 
 
 def unix_to_python(timestamp):
@@ -126,7 +154,7 @@ def parse_wellness(wellness, content):
     return wellness
 
 
-def parse_files(directory, target_directory):
+def parse_files(logger, directory, target_directory):
     heartrate = {}
     stress = {}
     sleep = {}
@@ -153,12 +181,13 @@ def parse_files(directory, target_directory):
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
             sleep[filename.split('_')[0]] = sleep_to_graphdata(content)
-        elif filename.endswith(".json"):
+        elif filename.endswith("_wellness.json"):
             # parse wellness data
             with open(os.path.join(directory, filename), 'r') as f:
                 content = json.load(f)
             wellness = parse_wellness(wellness, content)
         else:
+            logger.info('Skipping file %s', filename)
             continue
 
     # Reverse list so latest days are on top
@@ -183,7 +212,7 @@ def generate_wellnesspage(template_dir, outputfile, alldata):
         pf.write(output)
 
 
-def generate_dailystats(template_dir, outputdir, alldata):
+def generate_dailystats(logger, template_dir, outputdir, alldata):
     """ Generate graphs for the various measurements """
     loader = jinja2.FileSystemLoader(template_dir)
     environment = jinja2.Environment(loader=loader, trim_blocks=True, lstrip_blocks=True)
@@ -191,7 +220,7 @@ def generate_dailystats(template_dir, outputdir, alldata):
     try:
         template = environment.get_template('dailystats.html')
     except jinja2.exceptions.TemplateNotFound as e:
-        print 'E Template not found: ' + str(e) + ' in template dir ' + template_dir
+        logger.error('Template not found: %s in template dir %s', str(e), template_dir)
         sys.exit(2)
 
     for datestamp, summary in alldata['summaries']:
@@ -206,6 +235,8 @@ def generate_dailystats(template_dir, outputdir, alldata):
 
 
 if __name__ == "__main__":
+    logger = get_logger()
+
     parser = argparse.ArgumentParser(description='Garmin Data Visualiser',
                                      epilog='Because the hell with APIs!', add_help='How to use',
                                      prog='python visualise.py -i <input dir with Wellness json files> -o <output dir>')
@@ -223,7 +254,7 @@ if __name__ == "__main__":
     # Try to use the user argument from command line
     outputdir = args['output']
     inputdir = args['input']
-    alldata = parse_files(inputdir, outputdir)
+    alldata = parse_files(logger, inputdir, outputdir)
     template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
     #outputfile = os.path.join(outputdir, 'wellness.html')
 
@@ -232,4 +263,4 @@ if __name__ == "__main__":
         os.makedirs(outputdir)
 
     #generate_wellnesspage(template_dir, outputfile, alldata)
-    generate_dailystats(template_dir, outputdir, alldata)
+    generate_dailystats(logger, template_dir, outputdir, alldata)
