@@ -234,7 +234,7 @@ def generate_dailystats(logger, template_dir, outputdir, alldata):
             pf.write(output)
 
 
-if __name__ == "__main__":
+def run_visualisation():
     logger = get_logger()
 
     parser = argparse.ArgumentParser(description='Garmin Data Visualiser',
@@ -264,3 +264,7 @@ if __name__ == "__main__":
 
     #generate_wellnesspage(template_dir, outputfile, alldata)
     generate_dailystats(logger, template_dir, outputdir, alldata)
+
+
+if __name__ == "__main__":
+    run_visualisation()
