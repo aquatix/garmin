@@ -93,7 +93,7 @@ def get_daterange(start_date, end_date):
     return dates
 
 
-def login(agent, username, password):
+def login(logger, agent, username, password):
     global BASE_URL, GAUTH, REDIRECT, SSO, CSS
 
     # First establish contact with Garmin and decipher the local host.
@@ -157,6 +157,7 @@ def login(agent, username, password):
 
     # In theory, we're in.
 
+
 def file_exists_in_folder(filename, folder):
     "Check if the file exists in folder of any subfolder"
     for _, _, files in os.walk(folder):
@@ -164,7 +165,8 @@ def file_exists_in_folder(filename, folder):
             return True
     return False
 
-def activities(agent, outdir, increment = 100):
+
+def activities(logger, agent, username, outdir, increment = 100):
     global ACTIVITIES
     currentIndex = 0
     initUrl = ACTIVITIES % (currentIndex, increment)  # 100 activities seems a nice round number
@@ -183,8 +185,8 @@ def activities(agent, outdir, increment = 100):
             activityDate = item['activity']['activitySummary']['BeginTimestamp']['value'][:10]
             url = TCX % activityId
             file_name = '{}_{}.txt'.format(activityDate, activityId)
-            if file_exists_in_folder(file_name, output):
-                logger.info('{} already exists in {}. Skipping.'.format(file_name, output))
+            if file_exists_in_folder(file_name, outdir):
+                logger.info('{} already exists in {}. Skipping.'.format(file_name, outdir))
                 continue
             logger.info('{} is downloading...'.format(file_name))
             datafile = agent.open(url).get_data()
@@ -204,7 +206,8 @@ def activities(agent, outdir, increment = 100):
         response = agent.open(url)
         search = json.loads(response.get_data())
 
-def wellness(agent, start_date, display_name, outdir):
+
+def wellness(logger, agent, username, start_date, display_name, outdir):
     url = WELLNESS % (display_name, start_date, start_date)
     try:
         response = agent.open(url)
@@ -219,7 +222,7 @@ def wellness(agent, start_date, display_name, outdir):
         f.write(content)
 
 
-def dailysummary(agent, date, display_name, outdir):
+def dailysummary(logger, agent, username, date, display_name, outdir):
     url = DAILYSUMMARY % (display_name, date)
     try:
         response = agent.open(url)
@@ -234,7 +237,7 @@ def dailysummary(agent, date, display_name, outdir):
         f.write(content)
 
 
-def dailystress(agent, date, outdir):
+def dailystress(logger, agent, username, date, outdir):
     url = STRESS % (date)
     try:
         response = agent.open(url)
@@ -249,7 +252,7 @@ def dailystress(agent, date, outdir):
         f.write(content)
 
 
-def dailyheartrate(agent, date, display_name, outdir):
+def dailyheartrate(logger, agent, username, date, display_name, outdir):
     url = HEARTRATE % (display_name, date)
     try:
         response = agent.open(url)
@@ -264,7 +267,7 @@ def dailyheartrate(agent, date, display_name, outdir):
         f.write(content)
 
 
-def dailysleep(agent, date, display_name, outdir):
+def dailysleep(logger, agent, username, date, display_name, outdir):
     url = SLEEP % (display_name, date)
     try:
         response = agent.open(url)
@@ -279,15 +282,15 @@ def dailysleep(agent, date, display_name, outdir):
         f.write(content)
 
 
-def login_user(username, password):
+def login_user(logger, username, password):
     # Create the agent and log in.
     agent = me.Browser()
     logger.info("Attempting to login to Garmin Connect...")
-    login(agent, username, password)
+    login(logger, agent, username, password)
     return agent
 
 
-def download_files_for_user(agent, username, output):
+def download_files_for_user(logger, agent, username, output):
     user_output = os.path.join(output, username)
     download_folder = os.path.join(user_output, 'Historical')
 
@@ -296,10 +299,10 @@ def download_files_for_user(agent, username, output):
         os.makedirs(download_folder)
 
     # Scrape all the activities.
-    activities(agent, download_folder)
+    activities(logger, agent, username, download_folder)
 
 
-def download_wellness_for_user(agent, username, start_date, display_name, output):
+def download_wellness_for_user(logger, agent, username, start_date, display_name, output):
     user_output = os.path.join(output, username)
     download_folder = os.path.join(user_output, 'Wellness')
 
@@ -308,15 +311,15 @@ def download_wellness_for_user(agent, username, start_date, display_name, output
         os.makedirs(download_folder)
 
     # Scrape all wellness data.
-    wellness(agent, start_date, display_name, download_folder)
+    wellness(logger, agent, username, start_date, display_name, download_folder)
     # Daily summary, stress and heart rate do not do ranges, only fetch for `startdate`
-    dailysummary(agent, start_date, display_name, download_folder)
-    dailystress(agent, start_date, download_folder)
-    dailyheartrate(agent, start_date, display_name, download_folder)
-    dailysleep(agent, start_date, display_name, download_folder)
+    dailysummary(logger, agent, username, start_date, display_name, download_folder)
+    dailystress(logger, agent, username, start_date, download_folder)
+    dailyheartrate(logger, agent, username, start_date, display_name, download_folder)
+    dailysleep(logger, agent, username, start_date, display_name, download_folder)
 
 
-if __name__ == "__main__":
+def run_download():
     logger = get_logger()
 
     parser = argparse.ArgumentParser(description='Garmin Data Scraper',
@@ -381,10 +384,14 @@ if __name__ == "__main__":
             logger.error("Provide a displayname, you can find it in the url of Daily Summary: '.../daily-summary/<displayname>/...'")
             sys.exit(1)
         alldates = get_daterange(start_date, end_date)
-        agent = login_user(username, password)
+        agent = login_user(logger, username, password)
         for thisdate in alldates:
             logger.info('Downloading all wellness for %s...', thisdate)
-            download_wellness_for_user(agent, username, thisdate, display_name, output)
+            download_wellness_for_user(logger, agent, username, thisdate, display_name, output)
     else:
-        agent = login_user(username, password)
-        download_files_for_user(agent, username, output)
+        agent = login_user(logger, username, password)
+        download_files_for_user(logger, agent, username, output)
+
+
+if __name__ == "__main__":
+    run_download()
