@@ -223,15 +223,20 @@ def generate_dailystats(logger, template_dir, outputdir, alldata):
         logger.error('Template not found: %s in template dir %s', str(e), template_dir)
         sys.exit(2)
 
+    previousday = None
+    nextday = None
     for datestamp, summary in alldata['summaries']:
         outputfile = os.path.join(outputdir, datestamp + '.html')
         thisdate = datetime.strptime(datestamp, '%Y-%m-%d')
         alldata['datedayofweek'] = thisdate.strftime('%A')  # Day of week, e.g., Sunday, Monday...
         alldata['datestamp'] = datestamp
         alldata['summary'] = summary
+        alldata['previousday'] = previousday
+        alldata['nextday'] = nextday
         output = template.render(alldata)
         with open(outputfile, 'w') as pf:
             pf.write(output)
+        nextday = datestamp
 
 
 def run_visualisation():

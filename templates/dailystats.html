@@ -1,9 +1,47 @@
 {% extends "base.html" %}
 {% block pagetitle %}Wellness stats for {{ datedayofweek }} {{ datestamp }}{% endblock %}
 
+{% block extrastyling %}
+.navprev, .navnext
+{
+    font-family: Verdana, sans-serif;
+    color: #FFF;
+    text-decoration: none;
+    width: 49%;
+    display: block;
+    background-color: #222;
+    padding: .3em;
+}
+.navprev:hover, .navnext:hover
+{
+    background-color: #3E3E3E;
+}
+.navprev
+{
+    float: left;
+    text-align: left;
+}
+.navnext
+{
+    float: right;
+    text-align: right;
+}
+h1
+{
+    clear: both;
+}
+{% endblock %}
+
 {% block pagebody %}
 
-        <h1>Wellness stats for {{ datedayofweek }} {{ datestamp }}</h1>
+{% if previousday %}
+<a href="{{ previousday }}.html" class="navprev">&laquo; {{ previousday }}</a>
+{% endif %}
+{% if nextday %}
+<a href="{{ nextday }}.html" class="navnext">{{ nextday }} &raquo;</a>
+{% endif %}
+
+        <h1>{{ datedayofweek }} {{ datestamp }}</h1>
         <div class="contentblock">
 
         <canvas id="{{ datestamp }}"></canvas>
