@@ -12,6 +12,9 @@ and store it locally for further perusal and analysis. This is still very much
 preliminary; future versions should include the ability to seamlessly merge
 all the data into a single file, filter by workout type, and other features
 to be determined.
+
+2018-04-11 - Garmin appears to have deprecated its old REST api and legacy authentication
+The following updates work for me using Python 2.7 and Mechanize
 """
 
 import argparse
@@ -27,13 +30,13 @@ from getpass import getpass
 
 import mechanize as me
 
-BASE_URL = "http://connect.garmin.com/en-US/signin"
-GAUTH = "https://connect.garmin.com/gauth/hostname"
+BASE_URL = "https://sso.garmin.com/sso/login"
+GAUTH = "https://connect.garmin.com/modern/auth/hostname"
 SSO = "https://sso.garmin.com/sso"
 CSS = "https://static.garmincdn.com/com.garmin.connect/ui/css/gauth-custom-v1.2-min.css"
-REDIRECT = "https://connect.garmin.com/post-auth/login"
+REDIRECT = "https://connect.garmin.com/modern/"
 
-ACTIVITIES = "http://connect.garmin.com/proxy/activity-search-service-1.2/json/activities?start=%s&limit=%s"
+ACTIVITIES = "https://connect.garmin.com/modern/proxy/activitylist-service/activities/search/activities?start=%s&limit=%s"
 WELLNESS = "https://connect.garmin.com/modern/proxy/userstats-service/wellness/daily/%s?fromDate=%s&untilDate=%s"
 DAILYSUMMARY = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailySummaryChart/%s?date=%s"
 STRESS = "https://connect.garmin.com/modern/proxy/wellness-service/wellness/dailyStress/%s"
@@ -97,8 +100,9 @@ def login(logger, agent, username, password):
     global BASE_URL, GAUTH, REDIRECT, SSO, CSS
 
     # First establish contact with Garmin and decipher the local host.
+    agent.set_handle_robots(False)   # no robots
     page = agent.open(BASE_URL)
-    pattern = "\"\S+sso\.garmin\.com\S+\""
+    pattern = "\'\S+sso\.garmin\.com\\S+\'"
     script_url = re.search(pattern, page.get_data()).group()[1:-1]
     agent.set_handle_robots(False)   # no robots
     agent.set_handle_refresh(False)  # can sometimes hang without this
@@ -176,13 +180,17 @@ def activities(logger, agent, username, outdir, increment = 100):
         logger.warning('Wrong credentials for user {}. Skipping.'.format(username))
         return
     search = json.loads(response.get_data())
-    totalActivities = int(search['results']['totalFound'])
     while True:
-        for item in search['results']['activities']:
+        if len(search) == 0:
+            # All done!
+            print('Download complete')
+            break
+
+        for item in search:
             # Read this list of activities and save the files.
 
-            activityId = item['activity']['activityId']
-            activityDate = item['activity']['activitySummary']['BeginTimestamp']['value'][:10]
+            activityId = item['activityId']
+            activityDate = item['startTimeLocal'][:10]
             url = TCX % activityId
             file_name = '{}_{}.txt'.format(activityDate, activityId)
             if file_exists_in_folder(file_name, outdir):
@@ -195,10 +203,6 @@ def activities(logger, agent, username, outdir, increment = 100):
             f.write(datafile)
             f.close()
             shutil.copy(file_path, os.path.join(os.path.dirname(os.path.dirname(file_path)), file_name))
-
-        if (currentIndex + increment) > totalActivities:
-            # All done!
-            break
 
         # We still have at least 1 activity.
         currentIndex += increment
