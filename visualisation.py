@@ -90,7 +90,7 @@ def summary_to_graphdata(content):
             highlyactive_steps = item['steps']
         elif item['primaryActivityLevel'] == 'sleeping':
             sleeping_steps = item['steps']
-        elif item['primaryActivityLevel'] == 'generic' or item['primaryActivityLevel'] == 'none':
+        elif item['primaryActivityLevel'] == 'generic' or item['primaryActivityLevel'] == 'none' or item['primaryActivityLevel'] == 'unmonitored':
             generic_steps = item['steps']
         else:
             #print(item['primaryActivityLevel'])
