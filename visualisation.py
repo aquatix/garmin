@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import logging
 import os
@@ -223,7 +223,6 @@ def generate_dailystats(logger, template_dir, outputdir, alldata):
         logger.error('Template not found: %s in template dir %s', str(e), template_dir)
         sys.exit(2)
 
-    previousday = None
     nextday = None
     for datestamp, summary in alldata['summaries']:
         outputfile = os.path.join(outputdir, datestamp + '.html')
@@ -231,7 +230,7 @@ def generate_dailystats(logger, template_dir, outputdir, alldata):
         alldata['datedayofweek'] = thisdate.strftime('%A')  # Day of week, e.g., Sunday, Monday...
         alldata['datestamp'] = datestamp
         alldata['summary'] = summary
-        alldata['previousday'] = previousday
+        alldata['previousday'] = (thisdate - timedelta(days=1)).strftime('%Y-%m-%d')  # Assume there was no gap
         alldata['nextday'] = nextday
         output = template.render(alldata)
         with open(outputfile, 'w') as pf:
