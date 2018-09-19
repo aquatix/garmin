@@ -179,7 +179,7 @@ def activities(logger, agent, username, outdir, increment = 100):
     while True:
         if len(search) == 0:
             # All done!
-            print('Download complete')
+            # print('Download complete')
             break
 
         for item in search:
