@@ -149,15 +149,15 @@ def login(logger, agent, username, password):
 
     # Submit the login!
     res = agent.submit()
-    if res.get_data().find("Invalid") >= 0:
+    if res.get_data().find(b"Invalid") >= 0:
         quit("Login failed! Check your credentials, or submit a bug report.")
-    elif res.get_data().find("SUCCESS") >= 0:
+    elif res.get_data().find(b"SUCCESS") >= 0:
         logger.info('Login successful! Proceeding...')
     else:
         quit('UNKNOWN STATE. This script may need to be updated. Submit a bug report.')
 
     # Now we need a very specific URL from the response.
-    response_url = re.search("response_url\s*=\s*\"(.*)\";", res.get_data()).groups()[0]
+    response_url = re.search("response_url\s*=\s*\"(.*)\";", res.get_data().decode('utf-8')).groups()[0]
     agent.open(response_url.replace("\/", "/"))
 
     # In theory, we're in.
@@ -219,7 +219,7 @@ def wellness(logger, agent, username, start_date, display_name, outdir):
     except:
         logger.warning('Wrong credentials for user {}. Skipping wellness for {}.'.format(username, start_date))
         return
-    content = response.get_data()
+    content = response.get_data().decode('utf-8')
 
     file_name = '{}_wellness.json'.format(start_date)
     file_path = os.path.join(outdir, file_name)
