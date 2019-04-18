@@ -18,15 +18,20 @@ The following updates work for me using Python 2.7 and Mechanize
 """
 
 import argparse
-from datetime import datetime, timedelta
 import json
 import logging
 import os
 import re
 import shutil
 import sys
-import urllib
+from datetime import datetime, timedelta
 from getpass import getpass
+try:
+    # Python 3
+    from urllib.parse import urlencode
+except ImportError:
+    # Python 2
+    from urllib import urlencode
 
 import mechanize as me
 
@@ -130,7 +135,7 @@ def login(logger, agent, username, password):
             'generateExtraServiceTicket': 'false'}
 
     # ...and officially say "hello" to Garmin Connect.
-    login_url = 'https://sso.garmin.com/sso/login?%s' % urllib.urlencode(data)
+    login_url = 'https://sso.garmin.com/sso/login?%s' % urlencode(data)
     agent.open(login_url)
 
     # Set up the login form.
