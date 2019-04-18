@@ -180,7 +180,7 @@ def activities(logger, agent, username, outdir, increment = 100):
     except:
         logger.warning('Wrong credentials for user {}. Skipping.'.format(username))
         return
-    search = json.loads(response.get_data())
+    search = json.loads(response.get_data().decode('utf-8'))
     while True:
         if len(search) == 0:
             # All done!
@@ -198,7 +198,7 @@ def activities(logger, agent, username, outdir, increment = 100):
                 logger.info('{} already exists in {}. Skipping.'.format(file_name, outdir))
                 continue
             logger.info('{} is downloading...'.format(file_name))
-            datafile = agent.open(url).get_data()
+            datafile = agent.open(url).get_data().decode('utf-8')
             file_path = os.path.join(outdir, file_name)
             f = open(file_path, "w")
             f.write(datafile)
@@ -209,7 +209,7 @@ def activities(logger, agent, username, outdir, increment = 100):
         currentIndex += increment
         url = ACTIVITIES % (currentIndex, increment)
         response = agent.open(url)
-        search = json.loads(response.get_data())
+        search = json.loads(response.get_data().decode('utf-8'))
 
 
 def wellness(logger, agent, username, start_date, display_name, outdir):
@@ -234,7 +234,7 @@ def dailysummary(logger, agent, username, date, display_name, outdir):
     except:
         logger.warning('Wrong credentials for user {}. Skipping daily summary for {}.'.format(username, date))
         return
-    content = response.get_data()
+    content = response.get_data().decode('utf-8')
 
     file_name = '{}_summary.json'.format(date)
     file_path = os.path.join(outdir, file_name)
@@ -249,7 +249,7 @@ def dailystress(logger, agent, username, date, outdir):
     except:
         logger.warning('Wrong credentials for user {}. Skipping daily stress for {}.'.format(username, date))
         return
-    content = response.get_data()
+    content = response.get_data().decode('utf-8')
 
     file_name = '{}_stress.json'.format(date)
     file_path = os.path.join(outdir, file_name)
@@ -264,7 +264,7 @@ def dailyheartrate(logger, agent, username, date, display_name, outdir):
     except:
         logger.warning('Wrong credentials for user {}. Skipping daily heart rate for {}.'.format(username, date))
         return
-    content = response.get_data()
+    content = response.get_data().decode('utf-8')
 
     file_name = '{}_heartrate.json'.format(date)
     file_path = os.path.join(outdir, file_name)
@@ -279,7 +279,7 @@ def dailysleep(logger, agent, username, date, display_name, outdir):
     except:
         logger.warning('Wrong credentials for user {}. Skipping daily sleep for {}.'.format(username, date))
         return
-    content = response.get_data()
+    content = response.get_data().decode('utf-8')
 
     file_name = '{}_sleep.json'.format(date)
     file_path = os.path.join(outdir, file_name)
