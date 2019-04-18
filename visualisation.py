@@ -204,7 +204,7 @@ def generate_wellnesspage(template_dir, outputfile, alldata):
     try:
         template = environment.get_template('wellness.html')
     except jinja2.exceptions.TemplateNotFound as e:
-        print 'E Template not found: ' + str(e) + ' in template dir ' + template_dir
+        print('E Template not found: {} in template dir {}'.format(str(e), template_dir))
         sys.exit(2)
 
     output = template.render(alldata)
