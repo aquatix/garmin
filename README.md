@@ -1,3 +1,8 @@
+⚠️  [Moved to Codeberg](https://codeberg.org/diginaut/garmin) | [Read here why](https://dammit.nl/jumping-the-github-ship.html) ⚠️
+
+**This repository is not mirrored.**
+
+
 Garmin
 ======
 
